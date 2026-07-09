@@ -1167,7 +1167,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             firm:"Home base. Every document a case needs ends up here — uploaded, accepted by the AI analysis, and manually approved by your firm. Nothing counts as done until it is in this list.",
             ai:"Uploaded and passed the AI document analysis. Each one still needs a member of your firm to open it and approve it — every document requires firm approval, no exceptions.",
             flagged:"Uploaded, but the AI analysis found a problem — wrong document, missing pages, or unreadable. Review each one yourself: approve it if the AI got it wrong, or reject it to request a replacement.",
-            rejected:"Uploaded, reviewed, and rejected by your firm — with your reason attached. Each of these is re-requested from the debtor, reason included, in the next follow-up email.",
+            rejected:"Uploaded, reviewed, and rejected by your firm — with your reason attached. Each is re-requested from the debtor, reason included, in the next follow-up email — and then moves to Awaiting Upload.",
             na:"Documents the debtor told us they cannot provide, in their own words from the intake. Reasons like “I didn\u2019t file” or “I don\u2019t have a copy” are flagged for attorney judgment.",
             awaiting:"Not yet received — never uploaded or promised for later. Together with Rejected, this is what goes into the next follow-up email below.",
             total:"Every document on this case, in every state.",
@@ -1203,7 +1203,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               tasks=[{...openTask,id:Date.now()+5,status:"Pending",due:next,completedDate:undefined},...tasks];
             }
             update({
-              docChecklist:checklist.map(d=>isChase(d)?{...d,requestedDate:today}:d),
+              docChecklist:checklist.map(d=>isChase(d)?(d.reason==="rejected"?{...d,requestedDate:today,reason:undefined}:{...d,requestedDate:today}):d),
               communications:[comm,...(lead.communications||[])],
               tasks,
               timeline:[{id:Date.now()+1,date:today,action:"Document follow-up sent",detail:chase.length+" document"+(chase.length===1?"":"s")+" requested",user:"Matt McCune"},...(lead.timeline||[])]
@@ -2246,7 +2246,7 @@ function SettingsPage(){
                   ["#7a9c80","Approved by Firm","home base. Uploaded, accepted by the AI analysis, and manually approved by your firm. A case is document-complete when everything applicable is here."],
                   ["#F59E0B","Accepted by AI","uploaded and passed the AI analysis. Waiting on your firm's approval."],
                   ["#dc3545","AI Flagged","uploaded, but the AI found a problem (wrong document, missing pages, illegible). Your firm reviews it — approve anyway, or reject to re-request."],
-                  ["#dc3545","Rejected","reviewed and rejected by your firm, with the reason attached. Re-requested from the debtor, reason included, in the next follow-up email."],
+                  ["#dc3545","Rejected","reviewed and rejected by your firm, with the reason attached. Re-requested from the debtor in the next follow-up email and moved to Awaiting Upload."],
                   ["#999999","Not Applicable","the debtor gave a reason instead of uploading. Judgment-call reasons are flagged for attorney review."],
                   ["#F59E0B","Awaiting Upload","not yet received — never uploaded or promised for later. Awaiting Upload and Rejected together make up the follow-up email request list."],
                 ].map((c,i)=>(
