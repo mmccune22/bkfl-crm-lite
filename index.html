@@ -513,9 +513,9 @@ const DOC_TYPES=[
   {id:"sp_ssn_proof",name:"Spouse's Social Security card, W-2, or 1099",req:"required",group:"joint",when:"Filing jointly"},
   {id:"sp_tax_return_y1",name:"Spouse's tax return — last year",req:"needed",group:"joint",when:"Filing jointly, only if filed separately",note:"Reason chip: We filed together"},
   {id:"sp_tax_return_y2",name:"Spouse's tax return — two years ago",req:"needed",group:"joint",when:"Filing jointly, only if filed separately",note:"Reason chip: We filed together"},
-  {id:"sp_pay_stubs",name:"Spouse's pay stubs — last 6 months",req:"needed",group:"married_sep",when:"Married AND spouse employed = Yes (applies in joint cases too)"},
-  {id:"sp_other_income_proof",name:"Spouse's proof of other income — last 6 months",req:"needed",group:"married_sep",when:"Married AND spouse other income = Yes (applies in joint cases too)"},
-  {id:"sp_bank_statements",name:"Spouse's bank statements — last 6 months",req:"needed",group:"married_sep",when:"Married AND NOT filing jointly (joint filers' accounts are covered by bank statements)"},
+  {id:"sp_pay_stubs",name:"Spouse's pay stubs — last 6 months",req:"needed",group:"married_sep",when:"Spouse employed = Yes (joint or individual filing)"},
+  {id:"sp_other_income_proof",name:"Spouse's proof of other income — last 6 months",req:"needed",group:"married_sep",when:"Spouse other income = Yes (joint or individual filing)"},
+  {id:"sp_bank_statements",name:"Spouse's bank statements — last 6 months",req:"needed",group:"married_sep",when:"Married — joint or individual filing (all accounts, last 6 months)"},
 ];
 const DOC_REASONS={will_send_later:"I'll send it later",not_taken_yet:"I haven't taken the class yet",doesnt_apply:"Doesn't apply to me",didnt_file:"I didn't file that year",dont_have_copy:"I don't have a copy",filed_together:"We filed together"};
 const CHASE_REASONS=["will_send_later","not_taken_yet"]; /* keep the item on the chase list */
@@ -2196,19 +2196,19 @@ function SettingsPage(){
 
       {settingsTab==="docs"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#888",marginBottom:16}}>The document types collected by the AI intake. This list is fixed in this version. An individual case uses the first list; a joint case uses the first list plus the spouse documents. Items marked Required block the debtor from submitting the intake without them.</p>
+          <p style={{fontSize:13,color:"#888",marginBottom:16}}>The document types collected by the AI intake. This list is fixed in this version. Every case uses the first list. Married cases add spouse documents: filing jointly adds all 7; filing individually adds only the 3 income documents (the spouse isn't a filer, but their income counts for the means test — no spouse ID or Social Security proof needed). The 3 individual-filing documents appear in both married lists on purpose, so each list is complete on its own.</p>
           {[
-            {title:"All Cases (individual and joint)",group:"all"},
-            {title:"Joint Cases Only (married + filing jointly)",group:"joint"},
-            {title:"Married, Filing Individually (spouse income still counts for the means test)",group:"married_sep"},
+            {title:"All Cases (every filing)",ids:DOC_TYPES.filter(d=>d.group==="all").map(d=>d.id)},
+            {title:"Married — Filing Jointly (adds all 7 spouse documents)",ids:["sp_id_license","sp_ssn_proof","sp_tax_return_y1","sp_tax_return_y2","sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
+            {title:"Married — Filing Individually (adds only these 3 — also in the joint list)",ids:["sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
           ].map(sec=>(
-            <div key={sec.group} style={{background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden",marginBottom:16}}>
+            <div key={sec.title} style={{background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden",marginBottom:16}}>
               <div style={{background:"#e7eae5",padding:"12px 20px",borderBottom:"2px solid #7a9c80",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <span style={{fontSize:13,fontWeight:700,color:"#3d5c43",textTransform:"uppercase",letterSpacing:"0.5px"}}>{sec.title}</span>
-                <span style={{background:"#7a9c80",color:"#fff",borderRadius:12,padding:"2px 8px",fontSize:11,fontWeight:700}}>{DOC_TYPES.filter(d=>d.group===sec.group).length}</span>
+                <span style={{background:"#7a9c80",color:"#fff",borderRadius:12,padding:"2px 8px",fontSize:11,fontWeight:700}}>{sec.ids.length}</span>
               </div>
               <div>
-                {DOC_TYPES.filter(d=>d.group===sec.group).map(d=>{
+                {sec.ids.map(id=>DOC_TYPES.find(x=>x.id===id)).map(d=>{
                   const rb=reqBadge[d.req];
                   return(
                   <div key={d.id} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 20px",borderBottom:"1px solid #f5f5f5"}}>
