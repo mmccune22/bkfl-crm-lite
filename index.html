@@ -2196,7 +2196,7 @@ function SettingsPage(){
 
       {settingsTab==="docs"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#888",marginBottom:16}}>The document types collected by the AI intake. This list is fixed in this version. Every case uses the first list. Married cases add spouse documents: filing jointly adds all 7; filing individually adds only the 3 income documents (the spouse isn't a filer, but their income counts for the means test — no spouse ID or Social Security proof needed). The 3 individual-filing documents appear in both married lists on purpose, so each list is complete on its own.</p>
+          <p style={{fontSize:13,color:"#888",marginBottom:16}}>The document types collected by the AI intake. Every case uses the first list (All Cases — Every Filing). Married cases add spouse documents: filing jointly adds all 7; filing individually adds only the 3 income documents (the spouse isn't a filer, but their income counts for the means test — no spouse ID or Social Security proof needed).</p>
           {[
             {title:"All Cases (every filing)",ids:DOC_TYPES.filter(d=>d.group==="all").map(d=>d.id)},
             {title:"Married — Filing Jointly (adds all 7 spouse documents)",ids:["sp_id_license","sp_ssn_proof","sp_tax_return_y1","sp_tax_return_y2","sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
