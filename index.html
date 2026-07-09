@@ -2228,7 +2228,7 @@ function SettingsPage(){
               <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>How a document moves</div>
               <div style={{marginBottom:14}}>
                 {[
-                  ["Intake Submitted","the debtor's checklist is built from their intake answers. Documents uploaded with the intake go straight to AI analysis; everything else starts as Awaiting Upload."],
+                  ["Intake Submitted","the debtor's checklist is built from their intake answers. Documents uploaded with the intake go straight to AI analysis, and the AI recommends each one for final acceptance or rejection by the law firm. Anything not uploaded starts as Awaiting Upload."],
                   ["AI Analysis","every upload is analyzed automatically and either accepted or flagged."],
                   ["Firm Approval","a member of your firm approves or rejects it. AI acceptance is a recommendation — no document is final until your firm approves it. Rejected documents return to Awaiting Upload and join the next follow-up email."],
                 ].map((st,i)=>(
