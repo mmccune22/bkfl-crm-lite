@@ -521,7 +521,7 @@ const DOC_REASONS={will_send_later:"I'll send it later",not_taken_yet:"I haven't
 const CHASE_REASONS=["will_send_later","not_taken_yet"]; /* keep the item on the chase list */
 const REVIEW_REASONS=["doesnt_apply","didnt_file","dont_have_copy"]; /* closed, but flagged for attorney review */
 const docMeta=(docId)=>DOC_TYPES.find(d=>d.id===docId)||{name:docId,req:"optional"};
-const reqBadge={required:{label:"Required",bg:"#fde8e8",text:"#c0392b",border:"#f5b7b1"},needed:{label:"Needed",bg:"#fef3cd",text:"#856404",border:"#ffc107"},optional:{label:"Optional",bg:"#f0f0ed",text:"#888",border:"#ccc"}};
+const reqBadge={required:{label:"Must Upload",bg:"#fde8e8",text:"#c0392b",border:"#f5b7b1"},needed:{label:"Upload or Reason",bg:"#fef3cd",text:"#856404",border:"#ffc107"},optional:{label:"Optional",bg:"#f0f0ed",text:"#888",border:"#ccc"}};
 
 const MATTER_STAGES={
   "Chapter 7":["Hired – Matter Pending Documents and Payments","All Documents In – Paid in Full","Paralegal Review","Attorney Review","Client Signing","File Case","Chapter 7 Case Filed","341 Document Request","341 Preparation","341 Hearing","341 Followup","Discharge Entered","Case Closed"],
@@ -2199,6 +2199,11 @@ function SettingsPage(){
       {settingsTab==="docs"&&(
         <div style={{maxWidth:900}}>
           <p style={{fontSize:13,color:"#888",marginBottom:16}}>The document types collected by the AI intake. Every case uses the first list (All Cases — Every Filing). Married cases add spouse documents: filing jointly adds all 7; filing individually adds only the 3 income documents (the spouse isn't a filer, but their income counts for the means test — no spouse ID or Social Security proof needed).</p>
+          <div style={{display:"flex",gap:16,flexWrap:"wrap",marginBottom:16,fontSize:12,color:"#666"}}>
+            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fde8e8",color:"#c0392b",border:"1px solid #f5b7b1",marginRight:6}}>Must Upload</span>The debtor cannot submit the intake without it.</span>
+            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fef3cd",color:"#856404",border:"1px solid #ffc107",marginRight:6}}>Upload or Reason</span>Upload it, or tell us why not — never blocks submission.</span>
+            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#f0f0ed",color:"#888",border:"1px solid #ccc",marginRight:6}}>Optional</span>Helpful if they have it — never chased.</span>
+          </div>
           {[
             {title:"All Cases (every filing)",ids:DOC_TYPES.filter(d=>d.group==="all").map(d=>d.id)},
             {title:"Married — Filing Jointly (adds all 7 spouse documents)",ids:["sp_id_license","sp_ssn_proof","sp_tax_return_y1","sp_tax_return_y2","sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
