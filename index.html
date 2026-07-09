@@ -2228,9 +2228,9 @@ function SettingsPage(){
               <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>How a document moves</div>
               <div style={{marginBottom:14}}>
                 {[
-                  ["Awaiting Upload","requested from the debtor, not yet received."],
+                  ["Intake Submitted","the debtor's checklist is built from their intake answers. Documents uploaded with the intake go straight to AI analysis; everything else starts as Awaiting Upload."],
                   ["AI Analysis","every upload is analyzed automatically and either accepted or flagged."],
-                  ["Firm Approval","a member of your firm approves or rejects it. AI acceptance is a recommendation — no document is final until your firm approves it."],
+                  ["Firm Approval","a member of your firm approves or rejects it. AI acceptance is a recommendation — no document is final until your firm approves it. Rejected documents return to Awaiting Upload and join the next follow-up email."],
                 ].map((st,i)=>(
                   <div key={i} style={{display:"flex",gap:10,marginBottom:6}}>
                     <div style={{width:20,height:20,borderRadius:"50%",background:"#e7eae5",color:"#3d5c43",fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:2}}>{i+1}</div>
