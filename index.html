@@ -1158,16 +1158,18 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             firm:checklist.filter(d=>d.status==="approved"),
             ai:checklist.filter(d=>d.status==="ai_accepted"),
             flagged:checklist.filter(d=>d.status==="ai_flagged"),
+            rejected:checklist.filter(d=>d.status==="open"&&d.reason==="rejected"),
             na:checklist.filter(isNotNeeded),
-            awaiting:checklist.filter(isChase),
+            awaiting:checklist.filter(d=>isChase(d)&&d.reason!=="rejected"),
             total:checklist,
           };
           const bucketInfo={
             firm:"Home base. Every document a case needs ends up here — uploaded, accepted by the AI analysis, and manually approved by your firm. Nothing counts as done until it is in this list.",
             ai:"Uploaded and passed the AI document analysis. Each one still needs a member of your firm to open it and approve it — every document requires firm approval, no exceptions.",
             flagged:"Uploaded, but the AI analysis found a problem — wrong document, missing pages, or unreadable. Review each one yourself: approve it if the AI got it wrong, or reject it to request a replacement.",
+            rejected:"Uploaded, reviewed, and rejected by your firm — with your reason attached. Each of these is re-requested from the debtor, reason included, in the next follow-up email.",
             na:"Documents the debtor told us they cannot provide, in their own words from the intake. Reasons like “I didn\u2019t file” or “I don\u2019t have a copy” are flagged for attorney judgment.",
-            awaiting:"Not yet received — never uploaded, rejected by your firm, or promised for later. This list is exactly what goes into the next follow-up email below.",
+            awaiting:"Not yet received — never uploaded or promised for later. Together with Rejected, this is what goes into the next follow-up email below.",
             total:"Every document on this case, in every state.",
           };
           const shown=buckets[docFilter]||checklist;
@@ -1222,7 +1224,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                 <div style={{padding:24,textAlign:"center",color:"#999",fontSize:13,lineHeight:1.6}}>The document checklist is created automatically when the debtor submits their intake.<br/>You can still upload documents manually with the button above.</div>
               ):(<React.Fragment>
               <div style={{display:"flex",gap:0,borderBottom:"1px solid #eee",background:"#FBFAF7",flexWrap:"wrap"}}>
-                {[{k:"firm",l:"Approved by Firm"},{k:"ai",l:"Accepted by AI"},{k:"flagged",l:"AI Flagged"},{k:"na",l:"Not Applicable"},{k:"awaiting",l:"Awaiting Upload"},{k:"total",l:"Total"}].map(f=>(
+                {[{k:"firm",l:"Approved by Firm"},{k:"ai",l:"Accepted by AI"},{k:"flagged",l:"AI Flagged"},{k:"rejected",l:"Rejected"},{k:"na",l:"Not Applicable"},{k:"awaiting",l:"Awaiting Upload"},{k:"total",l:"Total"}].map(f=>(
                   <button key={f.k} onClick={()=>setDocFilter(f.k)} style={{padding:"9px 14px",fontSize:12,fontWeight:600,border:"none",borderBottom:docFilter===f.k?"2px solid #7a9c80":"2px solid transparent",background:"transparent",color:docFilter===f.k?"#3d5c43":((f.k==="ai"||f.k==="flagged")&&buckets[f.k].length>0?"#F59E0B":"#888"),cursor:"pointer"}}>{f.l} ({buckets[f.k].length})</button>
                 ))}
               </div>
@@ -1297,7 +1299,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             </div>
 
             {/* ── Next Follow-Up Email — lives with Awaiting Upload only ── */}
-            {docFilter==="awaiting"&&checklist.length>0&&(
+            {(docFilter==="awaiting"||docFilter==="rejected")&&checklist.length>0&&(
               <div style={{background:"#fff",borderRadius:8,border:"1px solid #e0e0e0",overflow:"hidden"}}>
                 <div style={{padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
                   <div>
@@ -2244,8 +2246,9 @@ function SettingsPage(){
                   ["#7a9c80","Approved by Firm","home base. Uploaded, accepted by the AI analysis, and manually approved by your firm. A case is document-complete when everything applicable is here."],
                   ["#F59E0B","Accepted by AI","uploaded and passed the AI analysis. Waiting on your firm's approval."],
                   ["#dc3545","AI Flagged","uploaded, but the AI found a problem (wrong document, missing pages, illegible). Your firm reviews it — approve anyway, or reject to re-request."],
+                  ["#dc3545","Rejected","reviewed and rejected by your firm, with the reason attached. Re-requested from the debtor, reason included, in the next follow-up email."],
                   ["#999999","Not Applicable","the debtor gave a reason instead of uploading. Judgment-call reasons are flagged for attorney review."],
-                  ["#F59E0B","Awaiting Upload","not yet received — never uploaded, promised for later, or rejected by your firm. This list is exactly what the follow-up email requests."],
+                  ["#F59E0B","Awaiting Upload","not yet received — never uploaded or promised for later. Awaiting Upload and Rejected together make up the follow-up email request list."],
                 ].map((c,i)=>(
                   <div key={i} style={{display:"flex",gap:10,marginBottom:6}}>
                     <div style={{width:10,height:10,borderRadius:"50%",background:c[0],flexShrink:0,marginTop:6}}/>
