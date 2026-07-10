@@ -2387,6 +2387,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
 
   const quickLinks=[
     {label:"Intake Form Link — New Lead",icon:"M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1",url:"https://dev-mccunelegal.bkfastlane.com/filer/signin"},
+    {label:"McCune Legal Website",icon:"M12 21a9 9 0 100-18 9 9 0 000 18zM3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18",url:"https://mccunelegal.com"},
   ];
 
   const cardStyle={background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden"};
@@ -2479,25 +2480,8 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
         </div>);
       })()}
 
-      <div style={{display:"grid",gridTemplateColumns:"1fr 2fr",gap:18,alignItems:"start"}}>
-        {/* LEFT: Quick Links */}
-        <div style={cardStyle}>
-          <div style={headerStyle}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="#7a9c80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            Quick Links
-          </div>
-          <div style={{padding:"12px 16px",display:"flex",flexDirection:"column",gap:8}}>
-            {quickLinks.map((ql,i)=>(
-              <button key={i} onClick={()=>{if(ql.url)window.open(ql.url,"_blank");}} style={{display:"flex",alignItems:"center",gap:8,background:"#7a9c80",color:"#fff",border:"none",borderRadius:8,padding:"10px 16px",fontSize:13,fontWeight:500,cursor:"pointer",transition:"all 0.15s",width:"100%"}} onMouseEnter={e=>e.currentTarget.style.background="#5a7c60"} onMouseLeave={e=>e.currentTarget.style.background="#7a9c80"}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d={ql.icon} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                {ql.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT: Tasks */}
-        <div style={{...cardStyle,display:"flex",flexDirection:"column"}}>
+      {/* ── Outstanding Tasks — full width ── */}
+      <div style={{...cardStyle,display:"flex",flexDirection:"column",marginBottom:18}}>
           <div style={{...headerStyle,justifyContent:"space-between"}}>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="#7a9c80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -2523,6 +2507,20 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
               </div>
             ))}
           </div>
+        </div>
+      {/* ── Quick Links — full width ── */}
+      <div style={cardStyle}>
+        <div style={headerStyle}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="#7a9c80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Quick Links
+        </div>
+        <div style={{padding:"12px 16px",display:"flex",gap:10,flexWrap:"wrap"}}>
+          {quickLinks.map((ql,i)=>(
+            <button key={i} onClick={()=>{if(ql.url)window.open(ql.url,"_blank");}} style={{display:"flex",alignItems:"center",gap:8,background:"#7a9c80",color:"#fff",border:"none",borderRadius:8,padding:"10px 18px",fontSize:13,fontWeight:500,cursor:"pointer",transition:"all 0.15s"}} onMouseEnter={e=>e.currentTarget.style.background="#5a7c60"} onMouseLeave={e=>e.currentTarget.style.background="#7a9c80"}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d={ql.icon} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              {ql.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
