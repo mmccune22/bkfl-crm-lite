@@ -523,6 +523,64 @@ const REVIEW_REASONS=["doesnt_apply","didnt_file","dont_have_copy"]; /* closed, 
 const docMeta=(docId)=>DOC_TYPES.find(d=>d.id===docId)||{name:docId,req:"optional"};
 const reqBadge={required:{label:"Must Upload",bg:"#fde8e8",text:"#c0392b",border:"#f5b7b1"},needed:{label:"Upload or Reason",bg:"#fef3cd",text:"#856404",border:"#ffc107"},optional:{label:"Optional",bg:"#f0f0ed",text:"#888",border:"#ccc"}};
 
+/* ─── DEMO INTAKE PACKAGES (keyed by lead email; produced by the AI intake on submission) ─── */
+const DEMO_INTAKE_PACKAGES={
+"ltran@email.com":{
+  submitted:"7/2/2026, 9:41 AM",court:"Central District of California",
+  goals:"Stop the foreclosure on our home, catch up on the mortgage through a plan, and protect my co-signed car loan.",
+  concerns:"Notice of default recorded on the house — sale date could be set within 60 days.",
+  household:{maritalStatus:"Married",jointFiling:"No",dependents:2,debtors:[{name:"Linda Tran",dob:"04/18/1984",ssn:"***-**-4821",email:"ltran@email.com",phone:"(310) 555-0244",address:"2214 Ocean View Ave, Long Beach, CA 90810"}]},
+  income:[{source:"Employment",employer:"St. Mary Medical Center",frequency:"Bi-weekly",monthly:4100,sixMonth:24600},{source:"Spouse income (not filing)",employer:"Harbor Freight Distribution",frequency:"Monthly",monthly:1200,sixMonth:7200}],
+  expenses:[{name:"Mortgage payment",monthly:2150,notes:""},{name:"Utilities (electric, gas, water)",monthly:240,notes:""},{name:"Phone, cell, internet",monthly:180,notes:""},{name:"Food & housekeeping supplies",monthly:780,notes:""},{name:"Transportation",monthly:340,notes:""},{name:"Vehicle payment",monthly:410,notes:"2019 Honda Civic"},{name:"Insurance (home, auto, health)",monthly:310,notes:""},{name:"Medical expenses",monthly:220,notes:""},{name:"Other",monthly:150,notes:"School activities for kids"}],
+  assets:[{name:"Primary residence — 2214 Ocean View Ave",category:"Real estate",value:415000,lien:388000,intent:"Keep — cure arrears through Ch. 13 plan"},{name:"2019 Honda Civic",category:"Vehicle",value:9200,lien:6100,intent:"Keep"},{name:"Checking at Chase",category:"Bank or financial account",value:800,lien:0,intent:""},{name:"Household goods and furnishings",category:"Household goods",value:4200,lien:0,intent:""},{name:"401(k) retirement account",category:"Retirement",value:22000,lien:0,intent:"Exempt"}],
+  debts:[{creditor:"Wells Fargo Home Mortgage",type:"secured",balance:388000,arrears:14200,collateral:"Primary residence"},{creditor:"Honda Financial Services",type:"secured",balance:6100,arrears:900,collateral:"2019 Honda Civic"},{creditor:"CreditOne (judgment)",type:"unsecured",balance:8900,arrears:0,collateral:""},{creditor:"Long Beach Memorial (medical)",type:"unsecured",balance:12400,arrears:0,collateral:""},{creditor:"IRS — 2024 income tax",type:"priority",balance:3100,arrears:0,collateral:""}],
+  sofa:{answers:[{q:"Prior addresses (3 years)",a:"No"},{q:"Job or business income",a:"Yes"},{q:"Other income",a:"Yes"},{q:"Creditor payments over $600 (90 days)",a:"Yes",entries:1},{q:"Lawsuits (1 year)",a:"Yes",entries:1},{q:"Repossession, foreclosure, or garnishment",a:"Yes",entries:1},{q:"Gifts over $600 (2 years)",a:"No"},{q:"Property transfers (2 years)",a:"No"},{q:"Closed financial accounts (1 year)",a:"No"},{q:"Storage unit (1 year)",a:"No"}],
+  events:[{event:"Foreclosure — notice of default",date:"06/12/2026",amount:14200,desc:"Notice of default recorded on residence; arrears through June."},{event:"Judgment entered",date:"05/03/2026",amount:8900,desc:"CreditOne credit card judgment; wage garnishment threatened."}]},
+  flags:[{severity:"HIGH",flag:"Foreclosure in progress",section:"Property",detail:"Notice of default on the primary residence — Ch. 13 cure timeline is tight; confirm sale date."},{severity:"INFO",flag:"Recent judgment",section:"Debts",detail:"CreditOne judgment entered 5/3/2026 — garnishment exposure before filing."}]},
+"dortega@email.com":{
+  submitted:"6/28/2026, 2:07 PM",court:"Central District of California",
+  goals:"Discharge credit card and medical debt, keep the house and the RAV4.",
+  concerns:"Collection calls at work; one account has gone to an attorney.",
+  household:{maritalStatus:"Married",jointFiling:"No",dependents:1,debtors:[{name:"David Ortega",dob:"09/22/1979",ssn:"***-**-7734",email:"dortega@email.com",phone:"(818) 555-0455",address:"1830 Palm Grove Dr, Burbank, CA 91505"}]},
+  income:[{source:"Employment",employer:"Delta Logistics",frequency:"Bi-weekly",monthly:5200,sixMonth:31200},{source:"Spouse income (not filing)",employer:"Burbank USD",frequency:"Monthly",monthly:1800,sixMonth:10800}],
+  expenses:[{name:"Mortgage payment",monthly:2380,notes:""},{name:"Utilities (electric, gas, water)",monthly:310,notes:""},{name:"Phone, cell, internet",monthly:190,notes:""},{name:"Food & housekeeping supplies",monthly:940,notes:""},{name:"Transportation",monthly:420,notes:""},{name:"Insurance (home, auto, health)",monthly:280,notes:""},{name:"Medical expenses",monthly:180,notes:""},{name:"Childcare",monthly:600,notes:""},{name:"Other",monthly:210,notes:""}],
+  assets:[{name:"Primary residence — 1830 Palm Grove Dr",category:"Real estate",value:505000,lien:462000,intent:"Keep — current on payments"},{name:"2021 Toyota RAV4",category:"Vehicle",value:19500,lien:11200,intent:"Keep — reaffirm or retain"},{name:"Checking at Bank of America",category:"Bank or financial account",value:1450,lien:0,intent:""},{name:"Household goods and furnishings",category:"Household goods",value:5100,lien:0,intent:""}],
+  debts:[{creditor:"Rocket Mortgage",type:"secured",balance:462000,arrears:0,collateral:"Primary residence"},{creditor:"Toyota Financial",type:"secured",balance:11200,arrears:0,collateral:"2021 Toyota RAV4"},{creditor:"Credit cards (4 accounts)",type:"unsecured",balance:31600,arrears:0,collateral:""},{creditor:"Providence St. Joseph (medical)",type:"unsecured",balance:9800,arrears:0,collateral:""}],
+  sofa:{answers:[{q:"Prior addresses (3 years)",a:"No"},{q:"Job or business income",a:"Yes"},{q:"Other income",a:"No"},{q:"Creditor payments over $600 (90 days)",a:"Yes",entries:1},{q:"Insider debt payments (1 year)",a:"No"},{q:"Lawsuits (1 year)",a:"No"},{q:"Property transfers (2 years)",a:"No"},{q:"Closed financial accounts (1 year)",a:"Yes",entries:1},{q:"Safe deposit box",a:"No"},{q:"Business connections (4 years)",a:"No"}],
+  events:[{event:"Preference-window payment",date:"05/20/2026",amount:1800,desc:"Paid Citi card $1,800 within 90 days of expected filing."},{event:"Closed account",date:"04/02/2026",amount:0,desc:"Closed Chase savings; funds moved to checking."}]},
+  flags:[{severity:"MEDIUM",flag:"Possible preference payment",section:"SOFA",detail:"$1,800 to a single creditor within 90 days — trustee may claw back; consider timing."},{severity:"INFO",flag:"Spouse income counts",section:"Income",detail:"Married filing individually — spouse income is included for the means test."}]},
+};
+
+/* Printable intake package — all intake answers in one document (save as PDF from the print dialog) */
+function buildIntakePackageHtml(lead,pkg){
+  const money=(n)=>typeof n==="number"?fmt(n):(n||"—");
+  const row=(cells,th)=>"<tr>"+cells.map(c=>"<"+(th?"th":"td")+">"+(c===0?"$0":(c||c===0?c:"—"))+"</"+(th?"th":"td")+">").join("")+"</tr>";
+  const table=(head,rows)=>"<table>"+row(head,true)+rows.join("")+"</table>";
+  let b="";
+  b+="<h2>Submission Summary</h2>"+table(["Lead","Submitted","Court"],[row([lead.firstName+" "+lead.lastName,pkg.submitted,pkg.court])]);
+  b+="<p><strong>Client goals:</strong> "+(pkg.goals||"—")+"</p><p><strong>Urgent concerns:</strong> "+(pkg.concerns||"—")+"</p>";
+  const h=pkg.household||{};
+  b+="<h2>Debtors &amp; Household</h2>"+table(["Debtor","DOB","SSN","Contact","Address"],(h.debtors||[]).map(d=>row([d.name,d.dob,d.ssn,(d.email||"")+"<br>"+(d.phone||""),d.address])));
+  b+="<p><strong>Marital status:</strong> "+(h.maritalStatus||"—")+" &nbsp; <strong>Joint filing:</strong> "+(h.jointFiling||"—")+" &nbsp; <strong>Dependents:</strong> "+(h.dependents!=null?h.dependents:"—")+"</p>";
+  b+="<h2>Income</h2>"+table(["Source","Employer","Frequency","Monthly","6-Month Total"],(pkg.income||[]).map(x=>row([x.source,x.employer,x.frequency,money(x.monthly),money(x.sixMonth)])));
+  b+="<h2>Expenses</h2>"+table(["Expense","Monthly","Notes"],(pkg.expenses||[]).map(x=>row([x.name,money(x.monthly),x.notes])));
+  b+="<h2>Property</h2>"+table(["Asset","Category","Value","Lien","Intent"],(pkg.assets||[]).map(x=>row([x.name,x.category,money(x.value),money(x.lien),x.intent])));
+  b+="<h2>Debts</h2>"+table(["Creditor","Type","Balance","Arrears","Collateral"],(pkg.debts||[]).map(x=>row([x.creditor,x.type,money(x.balance),money(x.arrears),x.collateral])));
+  const s=pkg.sofa||{};
+  b+="<h2>Financial Affairs (SOFA)</h2>"+table(["Question","Answer","Entries"],(s.answers||[]).map(x=>row([x.q,x.a,x.entries])));
+  if((s.events||[]).length)b+="<h3>Reported Events</h3>"+table(["Event","Date","Amount","Description"],(s.events||[]).map(x=>row([x.event,x.date,money(x.amount),x.desc])));
+  if((pkg.flags||[]).length)b+="<h2>Attorney Review Flags</h2>"+table(["Severity","Flag","Section","Detail"],(pkg.flags||[]).map(x=>row([x.severity,x.flag,x.section,x.detail])));
+  return "<html><head><title>Intake Package — "+lead.firstName+" "+lead.lastName+"</title><style>"+
+    "body{font-family:'Inter','Segoe UI',Arial,sans-serif;color:#333;max-width:760px;margin:0 auto;padding:36px;line-height:1.5;font-size:12.5px;}"+
+    "h1{font-size:19px;color:#3d5c43;border-bottom:2px solid #7a9c80;padding-bottom:8px;margin:0 0 4px;}"+
+    ".meta{font-size:11px;color:#888;margin:0 0 22px;}"+
+    "h2{font-size:14px;color:#3d5c43;margin:22px 0 8px;}h3{font-size:12.5px;color:#555;margin:14px 0 6px;}"+
+    "table{width:100%;border-collapse:collapse;margin:6px 0 10px;}th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#888;border-bottom:1.5px solid #ccc;padding:5px 8px;}td{padding:6px 8px;border-bottom:1px solid #eee;vertical-align:top;font-size:12px;}"+
+    "p{margin:4px 0 10px;}@media print{body{padding:0;}}"+
+    "</style></head><body><h1>BK FastLane — Intake Package</h1><div class='meta'>"+lead.firstName+" "+lead.lastName+" &middot; Submitted "+(pkg.submitted||"")+" &middot; Generated by the AI intake &middot; Attorney work product</div>"+b+"</body></html>";
+}
+
+
 const MATTER_STAGES={
   "Chapter 7":["Hired – Matter Pending Documents and Payments","All Documents In – Paid in Full","Paralegal Review","Attorney Review","Client Signing","File Case","Chapter 7 Case Filed","341 Document Request","341 Preparation","341 Hearing","341 Followup","Discharge Entered","Case Closed"],
   "Chapter 13":[],
@@ -987,6 +1045,8 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const [addingRequest,setAddingRequest]=useState(false);
   const [requestDocId,setRequestDocId]=useState("");
   const [requestCustom,setRequestCustom]=useState("");
+  const intakePkg=lead.intakePackage||DEMO_INTAKE_PACKAGES[lead.email]||null;
+  const printIntakePackage=()=>{if(!intakePkg)return;const w=window.open("","_blank","width=860,height=940");w.document.write(buildIntakePackageHtml(lead,intakePkg));w.document.close();w.focus();setTimeout(()=>{try{w.print();}catch(e){}},350);};
   const [taskNotify,setTaskNotify]=useState(null);
   const [taskNotifyPopup,setTaskNotifyPopup]=useState(null);
   const [taskMode,setTaskMode]=useState("custom");
@@ -1067,7 +1127,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const deleteEvent=async(id)=>{if(await confirm({title:"Delete Event",message:"Are you sure you want to delete this calendar event?",confirmLabel:"Delete"}))update({calendarEvents:(lead.calendarEvents||[]).filter(e=>e.id!==id)});};
 
 
-  const tabs=[{key:"dashboard",label:"Dashboard"},{key:"communications",label:"Communications"},{key:"notes",label:"Notes"},{key:"documents",label:"Documents"},{key:"tasks",label:"Tasks"},{key:"ai",label:"AI"}];
+  const tabs=[{key:"dashboard",label:"Dashboard"},{key:"intake",label:"Intake Package"},{key:"communications",label:"Communications"},{key:"notes",label:"Notes"},{key:"documents",label:"Documents"},{key:"tasks",label:"Tasks"},{key:"ai",label:"AI"}];
 
   const updateCF=(key,val)=>update({customFields:{...lead.customFields,[key]:val}});
   const EditVal=({field,value,isCF})=>{
@@ -1106,7 +1166,8 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             const _tomorrow=new Date(Date.now()+86400000).toISOString().split("T")[0];
             const closed=(lead.tasks||[]).map(tk=>tk.status!=="Completed"&&tk.stage==="Intake Sent"?{...tk,status:"Completed",completedDate:_t}:tk);
             const genChecklist=(lead.docChecklist&&lead.docChecklist.length)?lead.docChecklist:DOC_TYPES.filter(d=>d.group==="all"&&d.when==="Always"&&d.req!=="optional").map((d,i)=>d.req==="required"?(d.id==="bank_statements"?{id:i+1,docId:d.id,status:"ai_flagged",aiNote:"Only 3 of 6 months present",fileName:"bank-statements.pdf",date:_t}:{id:i+1,docId:d.id,status:"ai_accepted",aiNote:"Passed AI analysis",fileName:d.id.replace(/_/g,"-")+".pdf",date:_t}):{id:i+1,docId:d.id,status:"open"});
-            update({leadStage:"Intake Submitted",intakeSubmittedDate:_t,docChecklist:genChecklist,tasks:[{id:Date.now()+2,title:"Review & approve AI intake report email",due:_tomorrow,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted"},{id:Date.now()+3,title:"Approve document follow-up request",due:_week,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted",recurring:true},...closed],timeline:[{id:Date.now()+1,date:_t,action:"Intake submitted",detail:"Status: Intake Sent → Intake Submitted",user:"System"},...(lead.timeline||[])]});
+            const genPkg=lead.intakePackage||DEMO_INTAKE_PACKAGES[lead.email]||{submitted:new Date().toLocaleString("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}),court:"Central District of California",goals:"(Demo submission — goals captured from the intake form)",concerns:"—",household:{maritalStatus:"—",jointFiling:"No",dependents:0,debtors:[{name:lead.firstName+" "+lead.lastName,dob:"—",ssn:"—",email:lead.email||"—",phone:lead.phone||"—",address:"—"}]},income:[],expenses:[],assets:[],debts:[],sofa:{answers:[],events:[]},flags:[]};
+            update({leadStage:"Intake Submitted",intakeSubmittedDate:_t,intakePackage:genPkg,docChecklist:genChecklist,tasks:[{id:Date.now()+2,title:"Review & approve AI intake report email",due:_tomorrow,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted"},{id:Date.now()+3,title:"Approve document follow-up request",due:_week,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted",recurring:true},...closed],timeline:[{id:Date.now()+1,date:_t,action:"Intake submitted",detail:"Status: Intake Sent → Intake Submitted",user:"System"},...(lead.timeline||[])]});
           }} style={{padding:"7px 16px",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer",background:"#fff",color:"#888",border:"1px dashed #bbb"}}>Simulate Submission (dev)</button>}
           <button onClick={()=>openEdit(lead)} style={{padding:"7px 16px",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer",background:"#7A9C80",color:"#fff",border:"none"}}>Edit Lead</button>
         </div>}
@@ -1220,6 +1281,16 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                 </div>
                 <button onClick={addOther} style={{...btn,background:"#7a9c80",color:"#fff",border:"none",padding:"6px 14px",fontSize:12}}>Upload Document</button>
               </div>
+              {intakePkg&&(
+                <div style={{display:"flex",alignItems:"center",gap:12,padding:"11px 20px",borderBottom:"1px solid #eee",background:"#f4f7f2"}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#3d5c43" strokeWidth="1.6"/><path d="M14 2v6h6M9 13h6M9 17h6" stroke="#3d5c43" strokeWidth="1.6" strokeLinecap="round"/></svg>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13,fontWeight:700,color:"#3d5c43"}}>Intake Package (PDF)</div>
+                    <div style={{fontSize:11,color:"#7a9c80"}}>Every intake answer in one document — generated automatically at submission</div>
+                  </div>
+                  <button onClick={printIntakePackage} style={{padding:"6px 14px",fontSize:12,fontWeight:600,borderRadius:5,cursor:"pointer",border:"none",background:"#3d5c43",color:"#fff"}}>View / Save PDF</button>
+                </div>
+              )}
               {checklist.length===0?(
                 <div style={{padding:24,textAlign:"center",color:"#999",fontSize:13,lineHeight:1.6}}>The document checklist is created automatically when the debtor submits their intake.<br/>You can still upload documents manually with the button above.</div>
               ):(<React.Fragment>
@@ -1472,6 +1543,109 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                 })}</tbody>
               </table>)}
             </div>
+          </div>);
+        })()}
+
+        {tab==="intake"&&(()=>{
+          if(!intakePkg)return(<div style={{background:"#fff",borderRadius:8,border:"1px solid #e0e0e0",padding:32,textAlign:"center",color:"#999",fontSize:13,lineHeight:1.6}}>The Intake Package appears here when the debtor submits their intake.<br/>It collects every answer and document from the intake in one place.</div>);
+          const pkg=intakePkg;
+          const cl=lead.docChecklist||[];
+          const docsIn=cl.filter(d=>d.fileName&&(d.status==="approved"||d.status==="ai_accepted"||d.status==="ai_flagged")).length;
+          const money=(n)=>typeof n==="number"?fmt(n):(n||"—");
+          const thS={textAlign:"left",padding:"8px 14px",fontSize:10.5,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:0.5,borderBottom:"1px solid #e0e0e0",background:"#FBFAF7"};
+          const tdS={padding:"9px 14px",fontSize:12.5,color:"#434343",borderBottom:"1px solid #f5f5f5",verticalAlign:"top"};
+          const Sec=({title,right,children})=>(
+            <div style={{background:"#fff",borderRadius:8,border:"1px solid #e0e0e0",overflow:"hidden",marginBottom:16}}>
+              <div style={{padding:"12px 20px",borderBottom:"1px solid #eee",display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}>
+                <span style={{fontSize:14,fontWeight:700,color:"#434343"}}>{title}</span>
+                {right&&<span style={{fontSize:11.5,color:"#999"}}>{right}</span>}
+              </div>
+              {children}
+            </div>
+          );
+          const totInc=(pkg.income||[]).reduce((a,x)=>a+(x.monthly||0),0);
+          const totExp=(pkg.expenses||[]).reduce((a,x)=>a+(x.monthly||0),0);
+          const totAssets=(pkg.assets||[]).reduce((a,x)=>a+(x.value||0),0);
+          const totDebt=(pkg.debts||[]).reduce((a,x)=>a+(x.balance||0),0);
+          const sevColor={HIGH:"#dc3545",MEDIUM:"#F59E0B",INFO:"#7a9c80"};
+          return(<div>
+            {/* header band */}
+            <div style={{background:"#214e5f",borderRadius:8,padding:"18px 24px",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,flexWrap:"wrap"}}>
+              <div>
+                <div style={{fontSize:10.5,fontWeight:700,color:"rgba(255,255,255,0.65)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:3}}>BK FastLane Intake Package</div>
+                <div style={{fontSize:20,fontWeight:700,color:"#fff"}}>{lead.firstName} {lead.lastName}</div>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                {cl.length>0&&<span style={{background:"rgba(255,255,255,0.14)",color:"#fff",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{docsIn} of {cl.length} documents</span>}
+                {(pkg.flags||[]).length>0&&<span style={{background:"rgba(255,255,255,0.14)",color:"#ffd28a",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{pkg.flags.length} review flag{pkg.flags.length===1?"":"s"}</span>}
+                <span style={{background:"rgba(255,255,255,0.14)",color:"#b6e0c0",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>Ready for attorney review</span>
+                <button onClick={printIntakePackage} style={{background:"#fff",color:"#214e5f",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12.5,fontWeight:700,cursor:"pointer"}}>Save as PDF</button>
+              </div>
+            </div>
+
+            <Sec title="Submission Summary" right={"Submitted "+(pkg.submitted||"—")}>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:0}}>
+                <div style={{padding:"12px 20px",borderRight:"1px solid #f5f5f5"}}>
+                  <div style={{fontSize:10.5,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:0.5,marginBottom:4}}>Client Goals</div>
+                  <div style={{fontSize:13,color:"#434343",lineHeight:1.55}}>{pkg.goals||"—"}</div>
+                </div>
+                <div style={{padding:"12px 20px"}}>
+                  <div style={{fontSize:10.5,fontWeight:700,color:"#c0392b",textTransform:"uppercase",letterSpacing:0.5,marginBottom:4}}>Urgent Concerns</div>
+                  <div style={{fontSize:13,color:"#434343",lineHeight:1.55}}>{pkg.concerns||"—"}</div>
+                </div>
+              </div>
+              <div style={{padding:"10px 20px",borderTop:"1px solid #f5f5f5",fontSize:12,color:"#666"}}>Court: <strong style={{color:"#434343"}}>{pkg.court||"—"}</strong></div>
+            </Sec>
+
+            <Sec title="Debtors & Household" right={((pkg.household||{}).debtors||[]).length+" debtor"+(((pkg.household||{}).debtors||[]).length===1?"":"s")+" · "+((pkg.household||{}).dependents!=null?(pkg.household.dependents+" dependent"+(pkg.household.dependents===1?"":"s")):"")}>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Debtor</th><th style={thS}>Date of Birth</th><th style={thS}>SSN</th><th style={thS}>Contact</th><th style={thS}>Address</th></tr></thead>
+                <tbody>{((pkg.household||{}).debtors||[]).map((d,i)=>(<tr key={i}><td style={{...tdS,fontWeight:600}}>{d.name}</td><td style={tdS}>{d.dob}</td><td style={tdS}>{d.ssn}</td><td style={tdS}>{d.email}<br/>{d.phone}</td><td style={tdS}>{d.address}</td></tr>))}</tbody>
+              </table>
+              <div style={{padding:"10px 20px",fontSize:12.5,color:"#555"}}><strong>Marital status:</strong> {(pkg.household||{}).maritalStatus||"—"} &nbsp;&nbsp; <strong>Joint filing:</strong> {(pkg.household||{}).jointFiling||"—"} &nbsp;&nbsp; <strong>Dependents:</strong> {(pkg.household||{}).dependents!=null?pkg.household.dependents:"—"}</div>
+            </Sec>
+
+            <Sec title="Income & Expenses" right={money(totInc)+" income / "+money(totExp)+" expenses monthly"}>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Source</th><th style={thS}>Employer</th><th style={thS}>Frequency</th><th style={thS}>Monthly</th><th style={thS}>Six-Month Total</th></tr></thead>
+                <tbody>{(pkg.income||[]).map((x,i)=>(<tr key={i}><td style={{...tdS,fontWeight:600}}>{x.source}</td><td style={tdS}>{x.employer}</td><td style={tdS}>{x.frequency}</td><td style={tdS}>{money(x.monthly)}</td><td style={tdS}>{money(x.sixMonth)}</td></tr>))}</tbody>
+              </table>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Expense</th><th style={thS}>Monthly</th><th style={thS}>Notes</th></tr></thead>
+                <tbody>{(pkg.expenses||[]).map((x,i)=>(<tr key={i}><td style={tdS}>{x.name}</td><td style={tdS}>{money(x.monthly)}</td><td style={{...tdS,color:"#888"}}>{x.notes||"—"}</td></tr>))}</tbody>
+              </table>
+            </Sec>
+
+            <Sec title="Property & Debts" right={money(totAssets)+" assets / "+money(totDebt)+" debt"}>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Asset</th><th style={thS}>Category</th><th style={thS}>Value</th><th style={thS}>Lien</th><th style={thS}>Intent</th></tr></thead>
+                <tbody>{(pkg.assets||[]).map((x,i)=>(<tr key={i}><td style={{...tdS,fontWeight:600}}>{x.name}</td><td style={tdS}>{x.category}</td><td style={tdS}>{money(x.value)}</td><td style={tdS}>{x.lien?money(x.lien):"$0"}</td><td style={{...tdS,color:"#666"}}>{x.intent||"—"}</td></tr>))}</tbody>
+              </table>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Creditor</th><th style={thS}>Type</th><th style={thS}>Balance</th><th style={thS}>Arrears</th><th style={thS}>Collateral</th></tr></thead>
+                <tbody>{(pkg.debts||[]).map((x,i)=>(<tr key={i}><td style={{...tdS,fontWeight:600}}>{x.creditor}</td><td style={tdS}><span style={{padding:"1px 8px",borderRadius:4,fontSize:10.5,fontWeight:700,background:x.type==="secured"?"#dce8de":x.type==="priority"?"#fde8e8":"#f0f0ed",color:x.type==="secured"?"#3d5c43":x.type==="priority"?"#c0392b":"#666"}}>{x.type}</span></td><td style={tdS}>{money(x.balance)}</td><td style={tdS}>{x.arrears?money(x.arrears):"$0"}</td><td style={{...tdS,color:"#666"}}>{x.collateral||"—"}</td></tr>))}</tbody>
+              </table>
+            </Sec>
+
+            <Sec title="Financial Affairs (SOFA)" right={((pkg.sofa||{}).answers||[]).length+" answers · "+((pkg.sofa||{}).events||[]).length+" events"}>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Question</th><th style={thS}>Answer</th><th style={thS}>Entries</th></tr></thead>
+                <tbody>{((pkg.sofa||{}).answers||[]).map((x,i)=>(<tr key={i}><td style={tdS}>{x.q}</td><td style={{...tdS,fontWeight:700,color:x.a==="Yes"?"#b8963e":"#434343"}}>{x.a}</td><td style={tdS}>{x.entries||"—"}</td></tr>))}</tbody>
+              </table>
+              {((pkg.sofa||{}).events||[]).length>0&&(
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Event</th><th style={thS}>Date</th><th style={thS}>Amount</th><th style={thS}>Description</th></tr></thead>
+                <tbody>{pkg.sofa.events.map((x,i)=>(<tr key={i}><td style={{...tdS,fontWeight:600}}>{x.event}</td><td style={tdS}>{x.date}</td><td style={tdS}>{x.amount?money(x.amount):"—"}</td><td style={{...tdS,color:"#666"}}>{x.desc}</td></tr>))}</tbody>
+              </table>)}
+            </Sec>
+
+            {(pkg.flags||[]).length>0&&(
+            <Sec title="Attorney Review Flags" right={pkg.flags.length+" open"}>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                <thead><tr><th style={thS}>Severity</th><th style={thS}>Flag</th><th style={thS}>Section</th><th style={thS}>Attorney Detail</th></tr></thead>
+                <tbody>{pkg.flags.map((x,i)=>(<tr key={i}><td style={tdS}><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:(sevColor[x.severity]||"#999")+"22",color:sevColor[x.severity]||"#666",border:"1px solid "+(sevColor[x.severity]||"#999")}}>{x.severity}</span></td><td style={{...tdS,fontWeight:600}}>{x.flag}</td><td style={tdS}>{x.section}</td><td style={{...tdS,color:"#666"}}>{x.detail}</td></tr>))}</tbody>
+              </table>
+            </Sec>)}
           </div>);
         })()}
 
