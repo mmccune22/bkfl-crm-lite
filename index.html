@@ -1162,7 +1162,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const deleteEvent=async(id)=>{if(await confirm({title:"Delete Event",message:"Are you sure you want to delete this calendar event?",confirmLabel:"Delete"}))update({calendarEvents:(lead.calendarEvents||[]).filter(e=>e.id!==id)});};
 
 
-  const tabs=[{key:"dashboard",label:"Dashboard"},{key:"intake",label:"Intake Package"},{key:"communications",label:"Communications"},{key:"notes",label:"Notes"},{key:"documents",label:"Documents"},{key:"tasks",label:"Tasks"},{key:"ai",label:"AI"}];
+  const tabs=[{key:"dashboard",label:"Dashboard"},{key:"intake",label:"Intake Package"},{key:"documents",label:"Documents"},{key:"communications",label:"Communications"},{key:"notes",label:"Notes"},{key:"tasks",label:"Tasks"},{key:"ai",label:"AI"}];
 
   const updateCF=(key,val)=>update({customFields:{...lead.customFields,[key]:val}});
   const EditVal=({field,value,isCF})=>{
@@ -1181,14 +1181,12 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   return(
     <div style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh"}}>
       <div style={{background:"#fff",borderBottom:"1px solid #e0e0e0",padding:"20px 28px 0"}}>
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:4}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14}}>
           <button onClick={()=>{setPage("leads");setSelectedLead(null);}} style={{background:"none",border:"none",cursor:"pointer",padding:0,display:"flex"}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#7A9C80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
           <h1 style={{fontSize:22,fontWeight:700,color:"#434343",margin:0}}>{lead.firstName} {lead.lastName}</h1>
           <StageBadge stage={lead.leadStage}/>
         </div>
-        <p style={{color:"#666",fontSize:13,marginBottom:16,paddingLeft:32}}>{lead.bankruptcyType} Lead</p>
         {tab==="dashboard"&&<div style={{display:"flex",gap:8,marginBottom:16,paddingLeft:32}}>
-          <button style={{padding:"7px 16px",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer",background:"#fff",color:"#434343",border:"1px solid #d0d0d0"}}>Share</button>
           {lead.leadStage==="New Lead"&&<button onClick={()=>{
             const _t=new Date().toISOString().split("T")[0];
             const comm={id:Date.now(),date:_t,type:"Email",direction:"Outgoing",subject:"Your intake form link",body:"Hi "+lead.firstName+", here is your secure intake form link: https://intake.mccunelegal.com/form/lead-intake",to:lead.firstName+" "+lead.lastName,email:lead.email||""};
@@ -1605,16 +1603,16 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
           const sevColor={HIGH:"#dc3545",MEDIUM:"#F59E0B",INFO:"#7a9c80"};
           return(<div>
             {/* header band */}
-            <div style={{background:"#214e5f",borderRadius:8,padding:"18px 24px",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,flexWrap:"wrap"}}>
+            <div style={{background:"#dce8de",border:"1px solid #9bba9f",borderRadius:8,padding:"16px 24px",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,flexWrap:"wrap"}}>
               <div>
-                <div style={{fontSize:10.5,fontWeight:700,color:"rgba(255,255,255,0.65)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:3}}>BK FastLane Intake Package</div>
-                <div style={{fontSize:20,fontWeight:700,color:"#fff"}}>{lead.firstName} {lead.lastName}</div>
+                <div style={{fontSize:10.5,fontWeight:700,color:"#5a7c60",textTransform:"uppercase",letterSpacing:"1px",marginBottom:3}}>BK FastLane Intake Package</div>
+                <div style={{fontSize:20,fontWeight:700,color:"#3d5c43"}}>{lead.firstName} {lead.lastName}</div>
               </div>
               <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-                {cl.length>0&&<span style={{background:"rgba(255,255,255,0.14)",color:"#fff",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{docsIn} of {cl.length} documents</span>}
-                {(pkg.flags||[]).length>0&&<span style={{background:"rgba(255,255,255,0.14)",color:"#ffd28a",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{pkg.flags.length} review flag{pkg.flags.length===1?"":"s"}</span>}
-                <span style={{background:"rgba(255,255,255,0.14)",color:"#b6e0c0",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>Ready for attorney review</span>
-                <button onClick={printIntakePackage} style={{background:"#fff",color:"#214e5f",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12.5,fontWeight:700,cursor:"pointer"}}>Save as PDF</button>
+                {cl.length>0&&<span style={{background:"#fff",color:"#3d5c43",border:"1px solid #9bba9f",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{docsIn} of {cl.length} documents</span>}
+                {(pkg.flags||[]).length>0&&<span style={{background:"#fef3cd",color:"#856404",border:"1px solid #ffc107",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{pkg.flags.length} review flag{pkg.flags.length===1?"":"s"}</span>}
+                <span style={{background:"#7A9C80",color:"#fff",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>Ready for attorney review</span>
+                <button onClick={printIntakePackage} style={{background:"#7a9c80",color:"#fff",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12.5,fontWeight:700,cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#5a7c60"} onMouseLeave={e=>e.currentTarget.style.background="#7a9c80"}>Save as PDF</button>
               </div>
             </div>
 
