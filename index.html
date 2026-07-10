@@ -523,6 +523,39 @@ const REVIEW_REASONS=["doesnt_apply","didnt_file","dont_have_copy"]; /* closed, 
 const docMeta=(docId)=>DOC_TYPES.find(d=>d.id===docId)||{name:docId,req:"optional"};
 const reqBadge={required:{label:"Must Upload",bg:"#fde8e8",text:"#c0392b",border:"#f5b7b1"},needed:{label:"Upload or Reason",bg:"#fef3cd",text:"#856404",border:"#ffc107"},optional:{label:"Optional",bg:"#f0f0ed",text:"#888",border:"#ccc"}};
 
+
+/* ─── SOFA QUESTIONS — the 27 questions on the AI intake's Financial Affairs page ─── */
+const SOFA_QUESTIONS=[
+  {id:"prior_addresses",q:"Prior addresses (last 3 years)"},
+  {id:"community_property",q:"Lived with spouse/partner in a community-property state (8 years)"},
+  {id:"job_income",q:"Income from a job or business (this year + 2 prior)"},
+  {id:"other_income",q:"Other income — support, benefits, rental, lawsuits, gambling (this year + 2 prior)"},
+  {id:"creditor_payments_90",q:"Paid any one creditor $600 or more (last 90 days)"},
+  {id:"insider_debt_payments",q:"Payments on debts owed to an insider (1 year)"},
+  {id:"insider_benefit",q:"Payments or transfers that benefited an insider (1 year)"},
+  {id:"lawsuits",q:"Party to a lawsuit, court action, or administrative proceeding (1 year)"},
+  {id:"property_taken",q:"Property repossessed, foreclosed, garnished, seized, or levied (1 year)"},
+  {id:"setoff",q:"Creditor or bank setoff from an account (90 days)"},
+  {id:"receiver",q:"Property in the hands of a receiver, custodian, or assignee (1 year)"},
+  {id:"gifts",q:"Gifts over $600 to any one person (2 years)"},
+  {id:"charitable_gifts",q:"Gifts or contributions over $600 to charity (2 years)"},
+  {id:"losses",q:"Losses from theft, fire, disaster, or gambling (1 year)"},
+  {id:"bk_consult_payments",q:"Payments to anyone consulted about seeking bankruptcy relief (1 year)"},
+  {id:"debt_help_payments",q:"Payments to anyone promising to help deal with creditors (1 year)"},
+  {id:"property_transfers",q:"Property sold, traded, or transferred outside the ordinary course (2 years)"},
+  {id:"asset_protection",q:"Transfers to a self-settled trust or asset-protection device (10 years)"},
+  {id:"closed_accounts",q:"Financial accounts closed, sold, moved, or transferred (1 year)"},
+  {id:"safe_deposit",q:"Safe deposit box or other depository for valuables (now or within 1 year)"},
+  {id:"storage_unit",q:"Property stored outside the home — storage unit or elsewhere (1 year)"},
+  {id:"property_for_others",q:"Holding or controlling property that someone else owns"},
+  {id:"env_liability_notice",q:"Government notice of possible liability under an environmental law"},
+  {id:"env_release",q:"Notified a government unit of a release of hazardous material"},
+  {id:"env_proceeding",q:"Party to a proceeding under an environmental law"},
+  {id:"business_connections",q:"Owned a business or had a business connection (4 years)"},
+  {id:"business_fin_statements",q:"Gave a financial statement about the business to anyone (2 years)"},
+];
+const sofaAnswer=(pkg,id)=>{const v=((pkg.sofa||{}).answers||{})[id];return typeof v==="object"?v:(v?{a:v}:{a:"No"});};
+
 /* ─── DEMO INTAKE PACKAGES (keyed by lead email; produced by the AI intake on submission) ─── */
 const DEMO_INTAKE_PACKAGES={
 "ltran@email.com":{
@@ -534,7 +567,8 @@ const DEMO_INTAKE_PACKAGES={
   expenses:[{name:"Mortgage payment",monthly:2150,notes:""},{name:"Utilities (electric, gas, water)",monthly:240,notes:""},{name:"Phone, cell, internet",monthly:180,notes:""},{name:"Food & housekeeping supplies",monthly:780,notes:""},{name:"Transportation",monthly:340,notes:""},{name:"Vehicle payment",monthly:410,notes:"2019 Honda Civic"},{name:"Insurance (home, auto, health)",monthly:310,notes:""},{name:"Medical expenses",monthly:220,notes:""},{name:"Other",monthly:150,notes:"School activities for kids"}],
   assets:[{name:"Primary residence — 2214 Ocean View Ave",category:"Real estate",value:415000,lien:388000,intent:"Keep — cure arrears through Ch. 13 plan"},{name:"2019 Honda Civic",category:"Vehicle",value:9200,lien:6100,intent:"Keep"},{name:"Checking at Chase",category:"Bank or financial account",value:800,lien:0,intent:""},{name:"Household goods and furnishings",category:"Household goods",value:4200,lien:0,intent:""},{name:"401(k) retirement account",category:"Retirement",value:22000,lien:0,intent:"Exempt"}],
   debts:[{creditor:"Wells Fargo Home Mortgage",type:"secured",balance:388000,arrears:14200,collateral:"Primary residence"},{creditor:"Honda Financial Services",type:"secured",balance:6100,arrears:900,collateral:"2019 Honda Civic"},{creditor:"CreditOne (judgment)",type:"unsecured",balance:8900,arrears:0,collateral:""},{creditor:"Long Beach Memorial (medical)",type:"unsecured",balance:12400,arrears:0,collateral:""},{creditor:"IRS — 2024 income tax",type:"priority",balance:3100,arrears:0,collateral:""}],
-  sofa:{answers:[{q:"Prior addresses (3 years)",a:"No"},{q:"Job or business income",a:"Yes"},{q:"Other income",a:"Yes"},{q:"Creditor payments over $600 (90 days)",a:"Yes",entries:1},{q:"Lawsuits (1 year)",a:"Yes",entries:1},{q:"Repossession, foreclosure, or garnishment",a:"Yes",entries:1},{q:"Gifts over $600 (2 years)",a:"No"},{q:"Property transfers (2 years)",a:"No"},{q:"Closed financial accounts (1 year)",a:"No"},{q:"Storage unit (1 year)",a:"No"}],
+  counseling:"Not taken yet — provider link included with the intake",
+  sofa:{answers:{job_income:"Yes",other_income:"Yes",creditor_payments_90:{a:"Yes",entries:1},lawsuits:{a:"Yes",entries:1},property_taken:{a:"Yes",entries:1}},
   events:[{event:"Foreclosure — notice of default",date:"06/12/2026",amount:14200,desc:"Notice of default recorded on residence; arrears through June."},{event:"Judgment entered",date:"05/03/2026",amount:8900,desc:"CreditOne credit card judgment; wage garnishment threatened."}]},
   flags:[{severity:"HIGH",flag:"Foreclosure in progress",section:"Property",detail:"Notice of default on the primary residence — Ch. 13 cure timeline is tight; confirm sale date."},{severity:"INFO",flag:"Recent judgment",section:"Debts",detail:"CreditOne judgment entered 5/3/2026 — garnishment exposure before filing."}]},
 "dortega@email.com":{
@@ -546,7 +580,8 @@ const DEMO_INTAKE_PACKAGES={
   expenses:[{name:"Mortgage payment",monthly:2380,notes:""},{name:"Utilities (electric, gas, water)",monthly:310,notes:""},{name:"Phone, cell, internet",monthly:190,notes:""},{name:"Food & housekeeping supplies",monthly:940,notes:""},{name:"Transportation",monthly:420,notes:""},{name:"Insurance (home, auto, health)",monthly:280,notes:""},{name:"Medical expenses",monthly:180,notes:""},{name:"Childcare",monthly:600,notes:""},{name:"Other",monthly:210,notes:""}],
   assets:[{name:"Primary residence — 1830 Palm Grove Dr",category:"Real estate",value:505000,lien:462000,intent:"Keep — current on payments"},{name:"2021 Toyota RAV4",category:"Vehicle",value:19500,lien:11200,intent:"Keep — reaffirm or retain"},{name:"Checking at Bank of America",category:"Bank or financial account",value:1450,lien:0,intent:""},{name:"Household goods and furnishings",category:"Household goods",value:5100,lien:0,intent:""}],
   debts:[{creditor:"Rocket Mortgage",type:"secured",balance:462000,arrears:0,collateral:"Primary residence"},{creditor:"Toyota Financial",type:"secured",balance:11200,arrears:0,collateral:"2021 Toyota RAV4"},{creditor:"Credit cards (4 accounts)",type:"unsecured",balance:31600,arrears:0,collateral:""},{creditor:"Providence St. Joseph (medical)",type:"unsecured",balance:9800,arrears:0,collateral:""}],
-  sofa:{answers:[{q:"Prior addresses (3 years)",a:"No"},{q:"Job or business income",a:"Yes"},{q:"Other income",a:"No"},{q:"Creditor payments over $600 (90 days)",a:"Yes",entries:1},{q:"Insider debt payments (1 year)",a:"No"},{q:"Lawsuits (1 year)",a:"No"},{q:"Property transfers (2 years)",a:"No"},{q:"Closed financial accounts (1 year)",a:"Yes",entries:1},{q:"Safe deposit box",a:"No"},{q:"Business connections (4 years)",a:"No"}],
+  counseling:"Certificate received 6/29/2026 — approved provider (180-day validity)",
+  sofa:{answers:{job_income:"Yes",creditor_payments_90:{a:"Yes",entries:1},closed_accounts:{a:"Yes",entries:1}},
   events:[{event:"Preference-window payment",date:"05/20/2026",amount:1800,desc:"Paid Citi card $1,800 within 90 days of expected filing."},{event:"Closed account",date:"04/02/2026",amount:0,desc:"Closed Chase savings; funds moved to checking."}]},
   flags:[{severity:"MEDIUM",flag:"Possible preference payment",section:"SOFA",detail:"$1,800 to a single creditor within 90 days — trustee may claw back; consider timing."},{severity:"INFO",flag:"Spouse income counts",section:"Income",detail:"Married filing individually — spouse income is included for the means test."}]},
 };
@@ -558,7 +593,7 @@ function buildIntakePackageHtml(lead,pkg){
   const table=(head,rows)=>"<table>"+row(head,true)+rows.join("")+"</table>";
   let b="";
   b+="<h2>Submission Summary</h2>"+table(["Lead","Submitted","Court"],[row([lead.firstName+" "+lead.lastName,pkg.submitted,pkg.court])]);
-  b+="<p><strong>Client goals:</strong> "+(pkg.goals||"—")+"</p><p><strong>Urgent concerns:</strong> "+(pkg.concerns||"—")+"</p>";
+  b+="<p><strong>Client goals:</strong> "+(pkg.goals||"—")+"</p><p><strong>Urgent concerns:</strong> "+(pkg.concerns||"—")+"</p><p><strong>Counseling class:</strong> "+(pkg.counseling||"—")+"</p>";
   const h=pkg.household||{};
   b+="<h2>Debtors &amp; Household</h2>"+table(["Debtor","DOB","SSN","Contact","Address"],(h.debtors||[]).map(d=>row([d.name,d.dob,d.ssn,(d.email||"")+"<br>"+(d.phone||""),d.address])));
   b+="<p><strong>Marital status:</strong> "+(h.maritalStatus||"—")+" &nbsp; <strong>Joint filing:</strong> "+(h.jointFiling||"—")+" &nbsp; <strong>Dependents:</strong> "+(h.dependents!=null?h.dependents:"—")+"</p>";
@@ -567,7 +602,7 @@ function buildIntakePackageHtml(lead,pkg){
   b+="<h2>Property</h2>"+table(["Asset","Category","Value","Lien","Intent"],(pkg.assets||[]).map(x=>row([x.name,x.category,money(x.value),money(x.lien),x.intent])));
   b+="<h2>Debts</h2>"+table(["Creditor","Type","Balance","Arrears","Collateral"],(pkg.debts||[]).map(x=>row([x.creditor,x.type,money(x.balance),money(x.arrears),x.collateral])));
   const s=pkg.sofa||{};
-  b+="<h2>Financial Affairs (SOFA)</h2>"+table(["Question","Answer","Entries"],(s.answers||[]).map(x=>row([x.q,x.a,x.entries])));
+  b+="<h2>Financial Affairs (SOFA) — "+SOFA_QUESTIONS.length+" Questions</h2>"+table(["Question","Answer","Entries"],SOFA_QUESTIONS.map(qd=>{const v=sofaAnswer(pkg,qd.id);return row([qd.q,v.a==="Yes"?"<strong>Yes</strong>":v.a,v.entries]);}));
   if((s.events||[]).length)b+="<h3>Reported Events</h3>"+table(["Event","Date","Amount","Description"],(s.events||[]).map(x=>row([x.event,x.date,money(x.amount),x.desc])));
   if((pkg.flags||[]).length)b+="<h2>Attorney Review Flags</h2>"+table(["Severity","Flag","Section","Detail"],(pkg.flags||[]).map(x=>row([x.severity,x.flag,x.section,x.detail])));
   return "<html><head><title>Intake Package — "+lead.firstName+" "+lead.lastName+"</title><style>"+
@@ -1166,7 +1201,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             const _tomorrow=new Date(Date.now()+86400000).toISOString().split("T")[0];
             const closed=(lead.tasks||[]).map(tk=>tk.status!=="Completed"&&tk.stage==="Intake Sent"?{...tk,status:"Completed",completedDate:_t}:tk);
             const genChecklist=(lead.docChecklist&&lead.docChecklist.length)?lead.docChecklist:DOC_TYPES.filter(d=>d.group==="all"&&d.when==="Always"&&d.req!=="optional").map((d,i)=>d.req==="required"?(d.id==="bank_statements"?{id:i+1,docId:d.id,status:"ai_flagged",aiNote:"Only 3 of 6 months present",fileName:"bank-statements.pdf",date:_t}:{id:i+1,docId:d.id,status:"ai_accepted",aiNote:"Passed AI analysis",fileName:d.id.replace(/_/g,"-")+".pdf",date:_t}):{id:i+1,docId:d.id,status:"open"});
-            const genPkg=lead.intakePackage||DEMO_INTAKE_PACKAGES[lead.email]||{submitted:new Date().toLocaleString("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}),court:"Central District of California",goals:"(Demo submission — goals captured from the intake form)",concerns:"—",household:{maritalStatus:"—",jointFiling:"No",dependents:0,debtors:[{name:lead.firstName+" "+lead.lastName,dob:"—",ssn:"—",email:lead.email||"—",phone:lead.phone||"—",address:"—"}]},income:[],expenses:[],assets:[],debts:[],sofa:{answers:[],events:[]},flags:[]};
+            const genPkg=lead.intakePackage||DEMO_INTAKE_PACKAGES[lead.email]||{submitted:new Date().toLocaleString("en-US",{month:"numeric",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}),court:"Central District of California",goals:"(Demo submission — goals captured from the intake form)",concerns:"—",household:{maritalStatus:"—",jointFiling:"No",dependents:0,debtors:[{name:lead.firstName+" "+lead.lastName,dob:"—",ssn:"—",email:lead.email||"—",phone:lead.phone||"—",address:"—"}]},income:[],expenses:[],assets:[],debts:[],counseling:"—",sofa:{answers:{},events:[]},flags:[]};
             update({leadStage:"Intake Submitted",intakeSubmittedDate:_t,intakePackage:genPkg,docChecklist:genChecklist,tasks:[{id:Date.now()+2,title:"Review & approve AI intake report email",due:_tomorrow,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted"},{id:Date.now()+3,title:"Approve document follow-up request",due:_week,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted",recurring:true},...closed],timeline:[{id:Date.now()+1,date:_t,action:"Intake submitted",detail:"Status: Intake Sent → Intake Submitted",user:"System"},...(lead.timeline||[])]});
           }} style={{padding:"7px 16px",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer",background:"#fff",color:"#888",border:"1px dashed #bbb"}}>Simulate Submission (dev)</button>}
           <button onClick={()=>openEdit(lead)} style={{padding:"7px 16px",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer",background:"#7A9C80",color:"#fff",border:"none"}}>Edit Lead</button>
@@ -1594,7 +1629,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                   <div style={{fontSize:13,color:"#434343",lineHeight:1.55}}>{pkg.concerns||"—"}</div>
                 </div>
               </div>
-              <div style={{padding:"10px 20px",borderTop:"1px solid #f5f5f5",fontSize:12,color:"#666"}}>Court: <strong style={{color:"#434343"}}>{pkg.court||"—"}</strong></div>
+              <div style={{padding:"10px 20px",borderTop:"1px solid #f5f5f5",fontSize:12,color:"#666"}}>Court: <strong style={{color:"#434343"}}>{pkg.court||"—"}</strong> &nbsp;&nbsp;·&nbsp;&nbsp; Counseling class: <strong style={{color:"#434343"}}>{pkg.counseling||"—"}</strong></div>
             </Sec>
 
             <Sec title="Debtors & Household" right={((pkg.household||{}).debtors||[]).length+" debtor"+(((pkg.household||{}).debtors||[]).length===1?"":"s")+" · "+((pkg.household||{}).dependents!=null?(pkg.household.dependents+" dependent"+(pkg.household.dependents===1?"":"s")):"")}>
@@ -1627,10 +1662,10 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               </table>
             </Sec>
 
-            <Sec title="Financial Affairs (SOFA)" right={((pkg.sofa||{}).answers||[]).length+" answers · "+((pkg.sofa||{}).events||[]).length+" events"}>
+            <Sec title="Financial Affairs (SOFA)" right={SOFA_QUESTIONS.length+" questions · "+((pkg.sofa||{}).events||[]).length+" reported events"}>
               <table style={{width:"100%",borderCollapse:"collapse"}}>
                 <thead><tr><th style={thS}>Question</th><th style={thS}>Answer</th><th style={thS}>Entries</th></tr></thead>
-                <tbody>{((pkg.sofa||{}).answers||[]).map((x,i)=>(<tr key={i}><td style={tdS}>{x.q}</td><td style={{...tdS,fontWeight:700,color:x.a==="Yes"?"#b8963e":"#434343"}}>{x.a}</td><td style={tdS}>{x.entries||"—"}</td></tr>))}</tbody>
+                <tbody>{SOFA_QUESTIONS.map((qd,i)=>{const v=sofaAnswer(pkg,qd.id);return(<tr key={i} style={{background:v.a==="Yes"?"#fffcf5":"transparent"}}><td style={tdS}>{qd.q}</td><td style={{...tdS,fontWeight:700,color:v.a==="Yes"?"#b8963e":"#434343"}}>{v.a}</td><td style={tdS}>{v.entries||"—"}</td></tr>);})}</tbody>
               </table>
               {((pkg.sofa||{}).events||[]).length>0&&(
               <table style={{width:"100%",borderCollapse:"collapse"}}>
