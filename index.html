@@ -2365,11 +2365,7 @@ function SettingsPage(){
 
       {settingsTab==="tasks"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#666",marginBottom:12}}>Five pre-set tasks run the whole intake process. Every task is one decision and one click — the AI does the work, a person approves it.</p>
-          <div style={{background:"#fff",border:"1px solid #e0e0e0",borderRadius:10,padding:"14px 20px",marginBottom:16,fontSize:13,color:"#555",lineHeight:1.7}}>
-            <div style={{marginBottom:6}}><strong style={{color:"#434343"}}>Created instantly</strong> — when something happens: a lead is created, a link is sent, an intake comes in.</div>
-            <div><strong style={{color:"#434343"}}>Created at 5:00 a.m.</strong> — document review only. Overnight uploads are gathered into one task per lead, so five uploads never mean five tasks.</div>
-          </div>
+          <p style={{fontSize:13,color:"#666",marginBottom:16}}>Five pre-set tasks run the whole intake process. Every task is one decision and one click — the AI does the work, a person approves it.</p>
           {[
             {title:"Send the intake link",stage:"New Lead",created:"With the lead, whenever the intake link is not sent at creation",repeats:"One time",desc:"Keeps a new lead from sitting silently. The task completes itself the moment anyone clicks Send Intake Link — the task and the button are the same action."},
             {title:"Approve follow-up email — intake not completed",stage:"Intake Sent",created:"1 week after the intake link is sent",repeats:"Weekly, until the debtor submits the intake",desc:"The AI drafts a reminder email nudging the debtor to complete their intake form. The law firm reviews and approves it before it goes out. When the debtor submits, any open copy of this task is closed automatically."},
