@@ -2366,9 +2366,9 @@ function SettingsPage(){
         <div style={{maxWidth:900}}>
           <p style={{fontSize:13,color:"#666",marginBottom:16}}>Five pre-set tasks run the whole intake process. Every task is one decision and one click — the AI does the work, a person approves it.</p>
           {[
-            {title:"Send the intake link",stage:"New Lead",created:"With the lead, whenever the intake link is not sent at creation",repeats:"One time",desc:"Keeps a new lead from sitting silently. The task completes itself the moment anyone clicks Send Intake Link — the task and the button are the same action."},
+            {title:"Send the intake link",stage:"New Lead",created:"Automatically, when a new lead is saved without “Send Intake Form Link” checked — the intake email hasn’t gone out, so sending it becomes the first task",repeats:"Never — a one-time task",desc:"Keeps a new lead from sitting silently. The task completes itself the moment anyone clicks Send Intake Link — the task and the button are the same action."},
             {title:"Approve follow-up email — intake not completed",stage:"Intake Sent",created:"1 week after the intake link is sent",repeats:"Weekly, until the debtor submits the intake",desc:"The AI drafts a reminder email nudging the debtor to complete their intake form. The law firm reviews and approves it before it goes out. When the debtor submits, any open copy of this task is closed automatically."},
-            {title:"Review & approve AI intake report email",stage:"Intake Submitted",created:"Immediately when the intake packet is submitted",repeats:"One time",desc:"On submission, the AI analyzes the intake and generates a report for the debtor. The law firm reviews the report and approves the email before the debtor receives it. Nothing is sent without this approval."},
+            {title:"Review & approve AI intake report email",stage:"Intake Submitted",created:"Immediately when the intake packet is submitted",repeats:"Never — a one-time task",desc:"On submission, the AI analyzes the intake and generates a report for the debtor. The law firm reviews the report and approves the email before the debtor receives it. Nothing is sent without this approval."},
             {title:"Review submitted documents",stage:"Daily 5:00 AM Batch",batch:true,created:"By the daily 5:00 a.m. batch, for every lead with documents uploaded since the last run",repeats:"At most one open task per lead — the batch refreshes the document count on an existing open task instead of stacking a new one",desc:"Debtors upload in dribbles, so uploads are digested overnight rather than firing a task per file. The task deep-links straight into the lead's document review, and completes automatically when the review pile is cleared. The dashboard's Intake Inbox still shows live counts between batches."},
             {title:"Approve document follow-up request",stage:"Intake Submitted",created:"1 week after the intake packet is submitted",repeats:"Weekly, until the flagged documents are received",desc:"The AI compares the submitted packet against what the case requires and flags missing documents. It drafts a request email listing them; the law firm approves it before it is sent to the debtor."},
           ].map((task,i)=>{
@@ -2380,9 +2380,9 @@ function SettingsPage(){
                   <div style={{width:16,height:16,borderRadius:"50%",border:"2px solid #7a9c80",flexShrink:0}}/>
                   <span style={{fontSize:14,fontWeight:700,color:"#434343"}}>{task.title}</span>
                 </div>
-                <span style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:2}}>
-                  <span style={{fontSize:9,fontWeight:700,color:"#aaa",textTransform:"uppercase",letterSpacing:"0.6px"}}>{task.batch?"Runs":"Lead Stage"}</span>
-                  <span style={{background:sc.bg,color:sc.text,border:"1px solid "+sc.border,borderRadius:4,padding:"2px 10px",fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{task.stage}</span>
+                <span style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3}}>
+                  <span style={{fontSize:10.5,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:"0.6px"}}>{task.batch?"Runs":"Lead Stage"}</span>
+                  <span style={{background:sc.bg,color:sc.text,border:"1px solid "+sc.border,borderRadius:5,padding:"4px 14px",fontSize:12.5,fontWeight:700,whiteSpace:"nowrap"}}>{task.stage}</span>
                 </span>
               </div>
               <div style={{padding:"14px 20px"}}>
