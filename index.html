@@ -1077,7 +1077,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const [newTaskDesc,setNewTaskDesc]=useState("");
   const [showNewTask,setShowNewTask]=useState(false);
   const [taskFilter,setTaskFilter]=useState("outstanding");
-  const [docFilter,setDocFilter]=useState("firm");
+  const [docFilter,setDocFilter]=useState(()=>{const f0=window.__docFilter;window.__docFilter=null;return f0||"firm";});
   const [previewDoc,setPreviewDoc]=useState(null);
   const [rejectingDoc,setRejectingDoc]=useState(null);
   const [rejectNote,setRejectNote]=useState("");
@@ -1160,7 +1160,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const addTask=()=>{if(!newTaskTitle.trim())return;const taskId=Date.now();const isClient=lead.contacts.some(c=>(c.role==="Client"||c.role==="Lead")&&c.name===newTaskAssignee);update({tasks:[...lead.tasks,{id:taskId,title:newTaskTitle,description:newTaskDesc,due:newTaskDue,status:"Pending",assignee:newTaskAssignee,assignedBy:"Matt McCune",completedDate:""}]});const savedAssignee=newTaskAssignee;const savedTitle=newTaskTitle;setNewTaskTitle("");setNewTaskDue("");setNewTaskDesc("");setNewTaskAssignee("Matt McCune");setShowNewTask(false);if(isClient){setTaskNotifyPopup({taskId,assignee:savedAssignee,title:savedTitle});}};
   const addBuiltTask=()=>{if(!selectedBuiltTask)return;const bt=BUILT_TASKS.find(t=>t.title===selectedBuiltTask);if(!bt)return;const taskId=Date.now();const isClient=lead.contacts.some(c=>(c.role==="Client"||c.role==="Lead")&&c.name===builtTaskAssignee);update({tasks:[...lead.tasks,{id:taskId,title:bt.title,description:"",due:builtTaskDue,status:"Pending",assignee:builtTaskAssignee,assignedBy:"Matt McCune",completedDate:""}]});const savedAssignee=builtTaskAssignee;const savedTitle=bt.title;setSelectedBuiltTask("");setBuiltTaskDue("");setBuiltTaskAssignee("Matt McCune");setShowNewTask(false);if(isClient){setTaskNotifyPopup({taskId,assignee:savedAssignee,title:savedTitle});}};
   const toggleTask=(id)=>update({tasks:lead.tasks.map(t=>t.id===id?{...t,status:t.status==="Completed"?"Pending":"Completed",completedDate:t.status==="Completed"?"":new Date().toISOString().split("T")[0]}:t)});
-  const deleteTask=async(id)=>{if(await confirm({title:"Delete Task",message:"Are you sure you want to delete this task?",confirmLabel:"Delete"}))update({tasks:lead.tasks.filter(t=>t.id!==id)});};
+  const deleteTask=async(id)=>{if(await confirm({title:"Remove Task",message:"Remove this task without completing it? It stays in the task history as Removed.",confirmLabel:"Remove"}))update({tasks:lead.tasks.map(t=>t.id===id?{...t,status:"Removed",removedDate:new Date().toISOString().split("T")[0]}:t)});};
   const sendEmail=()=>{if(!emailBody.trim()||!emailSubject.trim())return;const newComm={id:Date.now(),date:new Date().toISOString().split("T")[0],type:"Email",direction:"Outgoing",subject:emailSubject,body:emailBody,to:lead.firstName+" "+lead.lastName,email:lead.email||""};update({communications:[newComm,...lead.communications]});setEmailBody("");setEmailSubject("");setShowEmailCompose(false);};
   const addEvent=()=>{if(!newEvTitle.trim()||!newEvStartDate)return;const ev={id:Date.now(),title:newEvTitle,date:newEvStartDate,endDate:newEvEndDate||newEvStartDate,time:newEvAllDay?"All day":newEvStartTime||"",endTime:newEvAllDay?"All day":newEvEndTime||"",allDay:newEvAllDay,location:newEvLocation,assignee:newEvAssignee};update({calendarEvents:[...(lead.calendarEvents||[]),ev]});setNewEvTitle("");setNewEvStartDate("");setNewEvStartTime("");setNewEvEndDate("");setNewEvEndTime("");setNewEvAllDay(false);setNewEvLocation("");setNewEvAssignee("Matt McCune");setShowNewEvent(false);};
   const deleteEvent=async(id)=>{if(await confirm({title:"Delete Event",message:"Are you sure you want to delete this calendar event?",confirmLabel:"Delete"}))update({calendarEvents:(lead.calendarEvents||[]).filter(e=>e.id!==id)});};
@@ -1450,9 +1450,10 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
 
         {tab==="tasks"&&(()=>{
           const allTasks=lead.tasks||[];
-          const outstanding=allTasks.filter(t=>t.status!=="Completed");
+          const outstanding=allTasks.filter(t=>t.status!=="Completed"&&t.status!=="Removed");
           const completed=allTasks.filter(t=>t.status==="Completed");
-          const filtered=taskFilter==="outstanding"?outstanding:completed;
+          const removedTasks=allTasks.filter(t=>t.status==="Removed");
+          const filtered=taskFilter==="outstanding"?outstanding:taskFilter==="removed"?removedTasks:completed;
           const assigneeOptions=[...ATTORNEYS,...STAFF,...(lead.contacts||[]).map(c=>c.name)].filter((v,i,a)=>a.indexOf(v)===i);
           return(<div>
             {/* Header */}
@@ -1538,14 +1539,14 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
 
             {/* Outstanding / Completed filter */}
             <div style={{display:"flex",gap:6,marginBottom:16}}>
-              {[{key:"outstanding",label:"Outstanding",count:outstanding.length},{key:"completed",label:"Completed",count:completed.length}].map(f=>(
+              {[{key:"outstanding",label:"Outstanding",count:outstanding.length},{key:"completed",label:"Completed",count:completed.length},{key:"removed",label:"Removed",count:removedTasks.length}].map(f=>(
                 <button key={f.key} onClick={()=>setTaskFilter(f.key)} style={{padding:"7px 16px",fontSize:13,fontWeight:taskFilter===f.key?600:400,cursor:"pointer",borderRadius:6,border:taskFilter===f.key?"2px solid #7A9C80":"1px solid #d0d0d0",background:taskFilter===f.key?"#E7EAE5":"#fff",color:taskFilter===f.key?"#3d5c43":"#888",transition:"all 0.15s"}}>{f.label} ({f.count})</button>
               ))}
             </div>
 
             {/* Tasks table */}
             <div style={{background:"#fff",borderRadius:8,border:"1px solid #e0e0e0",overflow:"hidden"}}>
-              {filtered.length===0?<div style={{padding:40,textAlign:"center",color:"#999"}}>{taskFilter==="outstanding"?"No outstanding tasks.":"No completed tasks."}</div>:(
+              {filtered.length===0?<div style={{padding:40,textAlign:"center",color:"#999"}}>{taskFilter==="outstanding"?"No outstanding tasks.":taskFilter==="removed"?"No removed tasks.":"No completed tasks."}</div>:(
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
                 <thead><tr style={{background:"#FBFAF7",borderBottom:"1px solid #e0e0e0"}}>
                   {["","Due Date","Name","Assigned To","Status",""].map((h,i)=><th key={i} style={{textAlign:"left",padding:"10px 14px",color:"#666",fontWeight:600,fontSize:12,textTransform:"uppercase",letterSpacing:0.5,width:h===""?(i===0?36:36):undefined}}>{h}</th>)}
@@ -2588,9 +2589,42 @@ function SettingsPage(){
 /* ─── DASHBOARD (LITE) ─── */
 function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
   const [confirm,confirmModal]=useConfirm();
+  const [taskModal,setTaskModal]=useState(null); /* an email-approval task opened as a draft */
+  const EMAIL_TASKS={
+    "Send the intake link":{tpl:"Intake Form Link",subject:"Your secure intake form — McCune Legal",body:(l)=>"Hi "+l.firstName+",\n\nThank you for reaching out to McCune Legal. To get started, please complete our secure intake form at the link below. It walks you through everything we need and lets you upload documents as you go.\n\nhttps://intake.mccunelegal.com/form/lead-intake\n\nIf you have any questions along the way, just reply to this email or call our office.\n\nMatt McCune"},
+    "Approve follow-up email — intake not completed":{tpl:"Intake Follow-Up",subject:"Quick reminder — your intake form is waiting",body:(l)=>"Hi "+l.firstName+",\n\nJust a friendly reminder that your intake form is still waiting for you. Completing it is the first step toward getting your case moving, and it usually takes about 20 minutes.\n\nhttps://intake.mccunelegal.com/form/lead-intake\n\nIf you've run into any trouble with the form or have questions, reply here and we'll help.\n\nMatt McCune"},
+    "Review & approve AI intake report email":{tpl:"AI Intake Report",subject:"Your intake review — McCune Legal",body:(l)=>"Hi "+l.firstName+",\n\nThank you for completing your intake. We've reviewed everything you submitted, and your personalized intake report is attached.\n\n[AI intake report — see the lead's Intake Package tab for the full report]\n\nWe'll be in touch about next steps. If anything in the report looks off, or you have questions, reply here or call our office.\n\nMatt McCune"},
+  };
+  const openTask=(t)=>{
+    if(t.batchDigest){window.__leadTab="documents";setSelectedLead(t.leadId);setPage("lead-detail");return;}
+    if(t.title==="Approve document follow-up request"){window.__leadTab="documents";window.__docFilter="awaiting";setSelectedLead(t.leadId);setPage("lead-detail");return;}
+    if(EMAIL_TASKS[t.title]){setTaskModal(t);return;}
+    setSelectedLead(t.leadId);setPage("lead-detail");
+  };
+  const approveTaskEmail=(t)=>{
+    const spec=EMAIL_TASKS[t.title];if(!spec)return;
+    const today3=new Date().toISOString().split("T")[0];
+    setLeads(prev=>prev.map(l=>{
+      if(l.id!==t.leadId)return l;
+      const comm={id:Date.now(),date:today3,type:"Email",direction:"Outgoing",subject:spec.subject,body:spec.body(l),to:l.firstName+" "+l.lastName,email:l.email||""};
+      let tasks=(l.tasks||[]).map(tk=>tk.id===t.id?{...tk,status:"Completed",completedDate:today3}:tk);
+      let patch={communications:[comm,...(l.communications||[])],timeline:[{id:Date.now()+1,date:today3,action:spec.tpl+" sent",detail:"Approved from the task queue",user:"Matt McCune"},...(l.timeline||[])]};
+      if(t.title==="Send the intake link"){
+        const _due=new Date(Date.now()+7*86400000).toISOString().split("T")[0];
+        patch.leadStage="Intake Sent";patch.intakeSentDate=today3;
+        tasks=[{id:Date.now()+2,title:"Approve follow-up email — intake not completed",due:_due,status:"Pending",assignee:"Matt McCune",stage:"Intake Sent",recurring:true},...tasks];
+      }else if(t.recurring&&l.leadStage===t.stage){
+        const next=new Date(Date.now()+7*86400000).toISOString().split("T")[0];
+        tasks=[{...t,id:Date.now()+3,status:"Pending",due:next,completedDate:undefined},...tasks];
+      }
+      return {...l,...patch,tasks};
+    }));
+    setTaskModal(null);
+  };
   const removeTask=async(t)=>{
-    if(await confirm({title:"Remove Task",message:'Remove "'+t.title+'" without completing it? It will be deleted from '+t.leadName+"'s task history.",confirmLabel:"Remove"})){
-      setLeads(prev=>prev.map(l=>l.id===t.leadId?{...l,tasks:(l.tasks||[]).filter(tk=>tk.id!==t.id)}:l));
+    if(await confirm({title:"Remove Task",message:'Remove "'+t.title+'" without completing it? It stays in '+t.leadName+"'s task history as Removed.",confirmLabel:"Remove"})){
+      const _d=new Date().toISOString().split("T")[0];
+      setLeads(prev=>prev.map(l=>l.id===t.leadId?{...l,tasks:(l.tasks||[]).map(tk=>tk.id===t.id?{...tk,status:"Removed",removedDate:_d}:tk)}:l));
     }
   };
   const today=new Date();
@@ -2607,7 +2641,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
   const todayISO=new Date().toISOString().split("T")[0];
   const allTasks=useMemo(()=>{
     const t=[];
-    (leads||[]).forEach(l=>{(l.tasks||[]).filter(tk=>tk.status!=="Completed").forEach(tk=>t.push({...tk,leadName:l.firstName+" "+l.lastName,leadId:l.id,leadStage:l.leadStage}));});
+    (leads||[]).forEach(l=>{(l.tasks||[]).filter(tk=>tk.status!=="Completed"&&tk.status!=="Removed").forEach(tk=>t.push({...tk,leadName:l.firstName+" "+l.lastName,leadId:l.id,leadStage:l.leadStage}));});
     return _.orderBy(t,"due","asc");
   },[leads]);
   const [dashTaskFilter,setDashTaskFilter]=useState("All");
@@ -2628,7 +2662,9 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
       return {...l,tasks};
     }));
   };
-  const completeTask=(t)=>setLeads(prev=>prev.map(l=>{
+  const completeTask=async(t)=>{
+    if(!(await confirm({title:"Mark Complete",message:'Mark "'+t.title+'" complete without opening it? Use this when it was handled outside the system.',confirmLabel:"Mark Complete"})))return;
+    setLeads(prev=>prev.map(l=>{
     if(l.id!==t.leadId)return l;
     let tasks=(l.tasks||[]).map(tk=>tk.id===t.id?{...tk,status:"Completed",completedDate:todayISO}:tk);
     if(t.recurring&&l.leadStage===t.stage){
@@ -2636,7 +2672,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
       tasks=[{...t,id:Date.now(),status:"Pending",due:next,completedDate:undefined},...tasks];
     }
     return {...l,tasks};
-  }));
+  }));};
 
 
   const quickLinks=[
@@ -2766,7 +2802,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
           <div style={{maxHeight:520,overflowY:"auto"}}>
             {tasks.length===0?<div style={{padding:16,textAlign:"center",color:"#999",fontSize:12}}>All tasks completed.</div>:
             tasks.map((t,i)=>(
-              <div key={i} onClick={()=>{if(t.batchDigest)window.__leadTab="documents";setSelectedLead(t.leadId);setPage("lead-detail");}} style={{display:"flex",gap:10,padding:"8px 14px",borderBottom:"1px solid #f5f5f5",cursor:"pointer",alignItems:"center"}} onMouseEnter={e=>e.currentTarget.style.background="#f2f3ef"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <div key={i} onClick={()=>openTask(t)} style={{display:"flex",gap:10,padding:"8px 14px",borderBottom:"1px solid #f5f5f5",cursor:"pointer",alignItems:"center"}} onMouseEnter={e=>e.currentTarget.style.background="#f2f3ef"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                 <div style={{width:60,flexShrink:0}}>
                   <div onClick={e=>{e.stopPropagation();completeTask(t);}} title="Mark complete" style={{width:18,height:18,borderRadius:"50%",border:"2px solid #7a9c80",cursor:"pointer",background:"transparent"}} onMouseEnter={e=>{e.currentTarget.style.background="#dce8de";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}/>
                 </div>
@@ -2799,6 +2835,37 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
           ))}
         </div>
       </div>
+      {taskModal&&(()=>{
+        const spec=EMAIL_TASKS[taskModal.title];
+        const l=leads.find(x=>x.id===taskModal.leadId);
+        if(!spec||!l)return null;
+        return(
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:60}} onClick={()=>setTaskModal(null)}>
+          <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:12,width:620,maxWidth:"92vw",maxHeight:"86vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.3)"}}>
+            <div style={{padding:"16px 24px",borderBottom:"1px solid #eee",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+              <div>
+                <div style={{fontSize:10.5,fontWeight:700,color:"#7a9c80",textTransform:"uppercase",letterSpacing:"0.6px",marginBottom:2}}>{spec.tpl} — drafted by AI, waiting on you</div>
+                <div style={{fontSize:16,fontWeight:700,color:"#434343"}}>{taskModal.title}</div>
+              </div>
+              <div style={{cursor:"pointer",fontSize:22,color:"#999",lineHeight:1}} onClick={()=>setTaskModal(null)}>&times;</div>
+            </div>
+            <div style={{padding:"16px 24px"}}>
+              <div style={{display:"grid",gridTemplateColumns:"70px 1fr",rowGap:8,columnGap:12,fontSize:13,marginBottom:14}}>
+                <span style={{color:"#999",fontWeight:600}}>To</span><span style={{color:"#434343"}}>{l.firstName} {l.lastName} &lt;{l.email||"no email on file"}&gt;</span>
+                <span style={{color:"#999",fontWeight:600}}>Subject</span><span style={{color:"#434343",fontWeight:600}}>{spec.subject}</span>
+              </div>
+              <div style={{background:"#FBFAF7",border:"1px solid #eee",borderRadius:8,padding:"14px 16px",fontSize:13,color:"#555",lineHeight:1.65,whiteSpace:"pre-wrap"}}>{spec.body(l)}</div>
+            </div>
+            <div style={{padding:"14px 24px",borderTop:"1px solid #eee",display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}>
+              <button onClick={()=>{setTaskModal(null);setSelectedLead(l.id);setPage("lead-detail");}} style={{background:"none",border:"none",cursor:"pointer",fontSize:12.5,color:"#7a9c80",fontWeight:600,padding:0}}>Open lead for context →</button>
+              <div style={{display:"flex",gap:10}}>
+                <button onClick={()=>setTaskModal(null)} style={{padding:"9px 18px",fontSize:13,fontWeight:500,border:"1px solid #d0d0d0",borderRadius:6,background:"#fff",color:"#434343",cursor:"pointer"}}>Cancel</button>
+                <button onClick={()=>approveTaskEmail(taskModal)} style={{padding:"9px 22px",fontSize:13,fontWeight:700,border:"none",borderRadius:6,background:"#7a9c80",color:"#fff",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#5a7c60"} onMouseLeave={e=>e.currentTarget.style.background="#7a9c80"}>Approve &amp; Send</button>
+              </div>
+            </div>
+          </div>
+        </div>);
+      })()}
       {confirmModal}
     </div>
   );
