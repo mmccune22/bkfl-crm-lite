@@ -1232,7 +1232,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
           <h1 style={{fontSize:22,fontWeight:700,color:"#434343",margin:0}}>{lead.firstName} {lead.lastName}</h1>
           <StageBadge stage={lead.leadStage}/>
         </div>
-        {tab==="dashboard"&&<div style={{display:"flex",gap:8,marginBottom:16,paddingLeft:32}}>
+        <div style={{display:"flex",gap:8,marginBottom:16,paddingLeft:32}}>
           {lead.leadStage==="New Lead"&&<button onClick={()=>{
             const _t=new Date().toISOString().split("T")[0];
             const comm={id:Date.now(),date:_t,type:"Email",direction:"Outgoing",subject:"Your secure intake form — McCune Legal",body:"Hi "+lead.firstName+",\n\nThank you for reaching out to McCune Legal. To get started, please complete our secure intake form at the link below. It walks you through everything we need and lets you upload documents as you go.\n\nhttps://intake.mccunelegal.com/form/lead-intake\n\nIf you have any questions along the way, just reply to this email or call our office.\n\nMcCune Legal",to:lead.firstName+" "+lead.lastName,email:lead.email||""};
@@ -1249,7 +1249,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             update({leadStage:"Intake Submitted",intakeSubmittedDate:_t,intakePackage:genPkg,docChecklist:genChecklist,tasks:[{id:Date.now()+2,title:"Review & approve AI Intake Summary email",due:_tomorrow,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted"},{id:Date.now()+3,title:"Approve document follow-up request",due:_week,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted",recurring:true},...closed],timeline:[{id:Date.now()+1,date:_t,action:"Intake submitted",detail:"Status: Intake Sent → Intake Submitted",user:"System"},...(lead.timeline||[])]});
           }} style={{padding:"7px 16px",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer",background:"#fff",color:"#888",border:"1px dashed #bbb"}}>Simulate Submission (dev)</button>}
           <button onClick={()=>openEdit(lead)} style={{padding:"7px 16px",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer",background:"#7A9C80",color:"#fff",border:"none"}}>Edit Lead</button>
-        </div>}
+        </div>
         <div style={{display:"flex",gap:0,overflowX:"auto",paddingLeft:32}}>
           {tabs.map(t=><button key={t.key} onClick={()=>setTab(t.key)} style={{padding:"10px 18px",fontSize:13,fontWeight:tab===t.key?600:400,cursor:"pointer",color:tab===t.key?"#7A9C80":"#666",background:"none",border:"none",borderBottom:tab===t.key?"3px solid #7A9C80":"3px solid transparent",whiteSpace:"nowrap"}}>{t.label}</button>)}
         </div>
