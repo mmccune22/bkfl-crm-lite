@@ -519,7 +519,7 @@ const DOC_TYPES=[
 ];
 const DOC_REASONS={will_send_later:"I'll send it later",not_taken_yet:"I haven't taken the class yet",doesnt_apply:"Doesn't apply to me",didnt_file:"I didn't file that year",dont_have_copy:"I don't have a copy",filed_together:"We filed together"};
 const CHASE_REASONS=["will_send_later","not_taken_yet"]; /* keep the item on the chase list */
-const REVIEW_REASONS=["doesnt_apply","didnt_file","dont_have_copy"]; /* closed, but flagged for attorney review */
+const REVIEW_REASONS=["doesnt_apply","didnt_file","dont_have_copy"]; /* closed, but flagged for law firm review */
 const docMeta=(docId)=>DOC_TYPES.find(d=>d.id===docId)||{name:docId,req:"optional"};
 const reqBadge={required:{label:"Must Upload",bg:"#fde8e8",text:"#c0392b",border:"#f5b7b1"},needed:{label:"Upload or Reason",bg:"#fef3cd",text:"#856404",border:"#ffc107"},optional:{label:"Optional",bg:"#f0f0ed",text:"#888",border:"#ccc"}};
 
@@ -604,7 +604,7 @@ function buildIntakePackageHtml(lead,pkg){
   const s=pkg.sofa||{};
   b+="<h2>Financial Affairs (SOFA) — "+SOFA_QUESTIONS.length+" Questions</h2>"+table(["Question","Answer","Entries"],SOFA_QUESTIONS.map(qd=>{const v=sofaAnswer(pkg,qd.id);return row([qd.q,v.a==="Yes"?"<strong>Yes</strong>":v.a,v.entries]);}));
   if((s.events||[]).length)b+="<h3>Reported Events</h3>"+table(["Event","Date","Amount","Description"],(s.events||[]).map(x=>row([x.event,x.date,money(x.amount),x.desc])));
-  if((pkg.flags||[]).length)b+="<h2>Attorney Review Flags</h2>"+table(["Severity","Flag","Section","Detail"],(pkg.flags||[]).map(x=>row([x.severity,x.flag,x.section,x.detail])));
+  if((pkg.flags||[]).length)b+="<h2>Law Firm Review Flags</h2>"+table(["Severity","Flag","Section","Detail"],(pkg.flags||[]).map(x=>row([x.severity,x.flag,x.section,x.detail])));
   return "<html><head><title>Intake Package — "+lead.firstName+" "+lead.lastName+"</title><style>"+
     "body{font-family:'Inter','Segoe UI',Arial,sans-serif;color:#333;max-width:760px;margin:0 auto;padding:36px;line-height:1.5;font-size:12.5px;}"+
     "h1{font-size:19px;color:#3d5c43;border-bottom:2px solid #7a9c80;padding-bottom:8px;margin:0 0 4px;}"+
@@ -1270,7 +1270,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             ai:"Uploaded and passed the AI document analysis. Each one still needs a member of your firm to open it and approve it — every document requires firm approval, no exceptions.",
             flagged:"Uploaded, but the AI analysis found a problem — wrong document, missing pages, or unreadable. Review each one yourself: approve it if the AI got it wrong, or reject it to request a replacement.",
             rejected:"Uploaded, reviewed, and rejected by your firm — with your reason attached. Each is re-requested from the debtor, reason included, in the next follow-up email — and then moves to Awaiting Upload.",
-            na:"Documents the debtor told us they cannot provide, in their own words from the intake. Reasons like “I didn\u2019t file” or “I don\u2019t have a copy” are flagged for attorney judgment.",
+            na:"Documents the debtor told us they cannot provide, in their own words from the intake. Reasons like “I didn\u2019t file” or “I don\u2019t have a copy” are flagged for law firm review.",
             awaiting:"Not yet received — never uploaded or promised for later. Together with Rejected, this is what goes into the next follow-up email below.",
             total:"Every document on this case, in every state.",
           };
@@ -1374,7 +1374,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                         {d.status==="open"&&(d.reason==="rejected"
                           ?<span><span style={{color:"#dc3545",fontWeight:600}}>Rejected by firm</span>{d.note?" — "+d.note:""}{d.requestedDate?" · re-requested "+d.requestedDate:""}</span>
                           :<span>{"Not yet received"}{d.requestedDate?" · requested "+d.requestedDate:""}</span>)}
-                        {d.status==="reason_given"&&<span>Debtor: “{DOC_REASONS[d.reason]||d.reason}”{REVIEW_REASONS.includes(d.reason)&&<span style={{marginLeft:6,padding:"1px 6px",borderRadius:3,fontSize:10,fontWeight:700,background:"#fde8e8",color:"#c0392b"}}>ATTORNEY REVIEW</span>}</span>}
+                        {d.status==="reason_given"&&<span>Debtor: “{DOC_REASONS[d.reason]||d.reason}”{REVIEW_REASONS.includes(d.reason)&&<span style={{marginLeft:6,padding:"1px 6px",borderRadius:3,fontSize:10,fontWeight:700,background:"#fde8e8",color:"#c0392b"}}>LAW FIRM REVIEW</span>}</span>}
                       </div>
                     </div>
                     <span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:rb.bg,color:rb.text,border:"1px solid "+rb.border,flexShrink:0}}>{rb.label}</span>
@@ -1628,7 +1628,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 {cl.length>0&&<span style={{background:"#fff",color:"#3d5c43",border:"1px solid #9bba9f",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{docsIn} of {cl.length} documents</span>}
                 {(pkg.flags||[]).length>0&&<span style={{background:"#fef3cd",color:"#856404",border:"1px solid #ffc107",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>{pkg.flags.length} review flag{pkg.flags.length===1?"":"s"}</span>}
-                <span style={{background:"#7A9C80",color:"#fff",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>Ready for attorney review</span>
+                <span style={{background:"#7A9C80",color:"#fff",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:600}}>Ready for law firm review</span>
                 <button onClick={printIntakePackage} style={{background:"#7a9c80",color:"#fff",border:"none",borderRadius:6,padding:"7px 16px",fontSize:12.5,fontWeight:700,cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#5a7c60"} onMouseLeave={e=>e.currentTarget.style.background="#7a9c80"}>Save as PDF</button>
               </div>
             </div>
@@ -1690,9 +1690,9 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             </Sec>
 
             {(pkg.flags||[]).length>0&&(
-            <Sec title="Attorney Review Flags" right={pkg.flags.length+" open"}>
+            <Sec title="Law Firm Review Flags" right={pkg.flags.length+" open"}>
               <table style={{width:"100%",borderCollapse:"collapse"}}>
-                <thead><tr><th style={thS}>Severity</th><th style={thS}>Flag</th><th style={thS}>Section</th><th style={thS}>Attorney Detail</th></tr></thead>
+                <thead><tr><th style={thS}>Severity</th><th style={thS}>Flag</th><th style={thS}>Section</th><th style={thS}>Detail</th></tr></thead>
                 <tbody>{pkg.flags.map((x,i)=>(<tr key={i}><td style={tdS}><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:(sevColor[x.severity]||"#999")+"22",color:sevColor[x.severity]||"#666",border:"1px solid "+(sevColor[x.severity]||"#999")}}>{x.severity}</span></td><td style={{...tdS,fontWeight:600}}>{x.flag}</td><td style={tdS}>{x.section}</td><td style={{...tdS,color:"#666"}}>{x.detail}</td></tr>))}</tbody>
               </table>
             </Sec>)}
@@ -2332,11 +2332,11 @@ function SettingsPage(){
 
       {settingsTab==="stages"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#888",marginBottom:16}}>Lead stages are fixed in this version and set automatically by the system — staff never change them by hand. Each stage carries pre-set tasks. Every AI-drafted email requires attorney approval before it is sent.</p>
+          <p style={{fontSize:13,color:"#888",marginBottom:16}}>Lead stages are fixed in this version and set automatically by the system — staff never change them by hand. Each stage carries pre-set tasks. Every AI-drafted email requires law firm approval before it is sent.</p>
           {[
             {name:"New Lead",desc:"A contact and lead exist, but the intake form has not been sent. Created manually by staff after a phone call, or automatically when a debtor first enters the system.",tasks:[{t:"Send the intake link",w:"Created with the lead when the link isn\u2019t sent at creation. Completes automatically the moment the link is sent."}]},
-            {name:"Intake Sent",desc:"The intake form link has been emailed to the debtor. Set automatically when Send Intake Link is clicked.",tasks:[{t:"Approve follow-up email — intake not completed",w:"Created 1 week after the link is sent and repeats weekly until the debtor submits. The attorney approves the AI-drafted reminder email before it goes to the lead."}]},
-            {name:"Intake Submitted",desc:"The debtor's intake packet has been received. Set automatically on submission — any open Intake Sent tasks are closed automatically.",tasks:[{t:"Review & approve AI intake report email",w:"Created immediately on submission. The attorney reviews the AI analysis report before it is emailed to the debtor."},{t:"Review submitted documents",w:"Created by the daily 5:00 a.m. batch whenever new documents arrive \u2014 one open task per lead, refreshed by each batch, completed when the review pile is cleared."},{t:"Approve document follow-up request",w:"Created 1 week after submission and repeats weekly. The attorney approves the AI-drafted request for documents the AI flagged as missing from the intake."}]},
+            {name:"Intake Sent",desc:"The intake form link has been emailed to the debtor. Set automatically when Send Intake Link is clicked.",tasks:[{t:"Approve follow-up email — intake not completed",w:"Created 1 week after the link is sent and repeats weekly until the debtor submits. The law firm approves the AI-drafted reminder email before it goes to the lead."}]},
+            {name:"Intake Submitted",desc:"The debtor's intake packet has been received. Set automatically on submission — any open Intake Sent tasks are closed automatically.",tasks:[{t:"Review & approve AI intake report email",w:"Created immediately on submission. The law firm reviews the AI analysis report before it is emailed to the debtor."},{t:"Review submitted documents",w:"Created by the daily 5:00 a.m. batch whenever new documents arrive \u2014 one open task per lead, refreshed by each batch, completed when the review pile is cleared."},{t:"Approve document follow-up request",w:"Created 1 week after submission and repeats weekly. The law firm approves the AI-drafted request for documents the AI flagged as missing from the intake."}]},
           ].map(s=>{
             const sc=leadStageColors[s.name]||{bg:"#f5f5f5",border:"#999",text:"#555"};
             return(
@@ -2372,10 +2372,10 @@ function SettingsPage(){
           </div>
           {[
             {title:"Send the intake link",stage:"New Lead",created:"With the lead, whenever the intake link is not sent at creation",repeats:"One time",desc:"Keeps a new lead from sitting silently. The task completes itself the moment anyone clicks Send Intake Link — the task and the button are the same action."},
-            {title:"Approve follow-up email — intake not completed",stage:"Intake Sent",created:"1 week after the intake link is sent",repeats:"Weekly, until the debtor submits the intake",desc:"The AI drafts a reminder email nudging the debtor to complete their intake form. The attorney reviews and approves it before it goes out. When the debtor submits, any open copy of this task is closed automatically."},
-            {title:"Review & approve AI intake report email",stage:"Intake Submitted",created:"Immediately when the intake packet is submitted",repeats:"One time",desc:"On submission, the AI analyzes the intake and generates a report for the debtor. The attorney reviews the report and approves the email before the debtor receives it. Nothing is sent without this approval."},
+            {title:"Approve follow-up email — intake not completed",stage:"Intake Sent",created:"1 week after the intake link is sent",repeats:"Weekly, until the debtor submits the intake",desc:"The AI drafts a reminder email nudging the debtor to complete their intake form. The law firm reviews and approves it before it goes out. When the debtor submits, any open copy of this task is closed automatically."},
+            {title:"Review & approve AI intake report email",stage:"Intake Submitted",created:"Immediately when the intake packet is submitted",repeats:"One time",desc:"On submission, the AI analyzes the intake and generates a report for the debtor. The law firm reviews the report and approves the email before the debtor receives it. Nothing is sent without this approval."},
             {title:"Review submitted documents",stage:"Daily 5:00 AM Batch",batch:true,created:"By the daily 5:00 a.m. batch, for every lead with documents uploaded since the last run",repeats:"At most one open task per lead — the batch refreshes the document count on an existing open task instead of stacking a new one",desc:"Debtors upload in dribbles, so uploads are digested overnight rather than firing a task per file. The task deep-links straight into the lead's document review, and completes automatically when the review pile is cleared. The dashboard's Intake Inbox still shows live counts between batches."},
-            {title:"Approve document follow-up request",stage:"Intake Submitted",created:"1 week after the intake packet is submitted",repeats:"Weekly, until the flagged documents are received",desc:"The AI compares the submitted packet against what the case requires and flags missing documents. It drafts a request email listing them; the attorney approves it before it is sent to the debtor."},
+            {title:"Approve document follow-up request",stage:"Intake Submitted",created:"1 week after the intake packet is submitted",repeats:"Weekly, until the flagged documents are received",desc:"The AI compares the submitted packet against what the case requires and flags missing documents. It drafts a request email listing them; the law firm approves it before it is sent to the debtor."},
           ].map((task,i)=>{
             const sc=task.batch?{bg:"#fef3cd",border:"#F59E0B",text:"#856404"}:(leadStageColors[task.stage]||{bg:"#f5f5f5",border:"#999",text:"#555"});
             return(
@@ -2401,9 +2401,9 @@ function SettingsPage(){
 
       {settingsTab==="communications"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#888",marginBottom:16}}>Pre-drafted template emails. Each one is drafted by the AI from these templates, and the attorney approves it (via its task) before anything is sent to the lead. Fields in braces are filled automatically.</p>
+          <p style={{fontSize:13,color:"#888",marginBottom:16}}>Pre-drafted template emails. Each one is drafted by the AI from these templates, and the law firm approves it (via its task) before anything is sent to the lead. Fields in braces are filled automatically.</p>
           {[
-            {name:"Intake Form Link",when:"Sent when the intake link is emailed to a new lead — moves the lead to Intake Sent",task:"Sent directly by staff (no approval task)",subject:"Your secure intake form — {FirmName}",body:"Hi {FirstName},\n\nThank you for reaching out to {FirmName}. To get started, please complete our secure intake form at the link below. It walks you through everything we need and lets you upload documents as you go.\n\n{IntakeLink}\n\nIf you have any questions along the way, just reply to this email or call our office.\n\n{AttorneyName}"},
+            {name:"Intake Form Link",when:"Sent when the intake link is emailed to a new lead — moves the lead to Intake Sent",task:"Sent directly by the law firm (no approval task)",subject:"Your secure intake form — {FirmName}",body:"Hi {FirstName},\n\nThank you for reaching out to {FirmName}. To get started, please complete our secure intake form at the link below. It walks you through everything we need and lets you upload documents as you go.\n\n{IntakeLink}\n\nIf you have any questions along the way, just reply to this email or call our office.\n\n{AttorneyName}"},
             {name:"Intake Follow-Up",when:"Drafted 1 week after the intake link is sent; weekly until the debtor submits",task:"Approve follow-up email — intake not completed",subject:"Quick reminder — your intake form is waiting",body:"Hi {FirstName},\n\nJust a friendly reminder that your intake form is still waiting for you. Completing it is the first step toward getting your case moving, and it usually takes about 20 minutes.\n\n{IntakeLink}\n\nIf you've run into any trouble with the form or have questions, reply here and we'll help.\n\n{AttorneyName}"},
             {name:"AI Intake Report",when:"Drafted immediately after the intake packet is submitted",task:"Review & approve AI intake report email",subject:"Your intake review — {FirmName}",body:"Hi {FirstName},\n\nThank you for completing your intake. We've reviewed everything you submitted, and your personalized intake report is below.\n\n{AIReport}\n\nWe'll be in touch about next steps. If anything in the report looks off, or you have questions, reply here or call our office.\n\n{AttorneyName}"},
             {name:"Document Request Follow-Up",when:"Drafted 1 week after submission; weekly until the flagged documents are received",task:"Approve document follow-up request",subject:"A few documents we still need",body:"Hi {FirstName},\n\nThanks again for submitting your intake. To keep your case moving, we still need the following:\n\n{MissingDocuments}\n\nYou can upload these through your secure portal at the link below.\n\n{UploadLink}\n\nIf you're not sure where to find any of these, reply here and we'll point you in the right direction.\n\n{AttorneyName}"},
@@ -2482,7 +2482,7 @@ function SettingsPage(){
                   ["#F59E0B","Accepted by AI","uploaded and passed the AI analysis. Waiting on your firm's approval."],
                   ["#dc3545","AI Flagged","uploaded, but the AI found a problem (wrong document, missing pages, illegible). Your firm reviews it — approve anyway, or reject to re-request."],
                   ["#dc3545","Rejected","reviewed and rejected by your firm, with the reason attached. Re-requested from the debtor in the next follow-up email and moved to Awaiting Upload."],
-                  ["#999999","Not Applicable","the debtor gave a reason instead of uploading. Judgment-call reasons are flagged for attorney review."],
+                  ["#999999","Not Applicable","the debtor gave a reason instead of uploading. Judgment-call reasons are flagged for law firm review."],
                   ["#F59E0B","Awaiting Upload","not yet received — never uploaded or promised for later. Awaiting Upload and Rejected together make up the follow-up email request list."],
                 ].map((c,i)=>(
                   <div key={i} style={{display:"flex",gap:10,marginBottom:6}}>
@@ -2495,7 +2495,7 @@ function SettingsPage(){
               <p style={{margin:"0 0 14px"}}>Once a week, the AI drafts a single follow-up email listing everything still awaiting upload — including anything your firm rejected, with the rejection reason written in. It is never sent automatically: it arrives as the task “Approve document follow-up request” and goes out only after someone at your firm approves it. Follow-ups repeat weekly until every item is received or accounted for.</p>
               <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>What the debtor's reasons do</div>
               <p style={{margin:"0 0 6px"}}><strong>Keep chasing:</strong> “{DOC_REASONS.will_send_later}” and “{DOC_REASONS.not_taken_yet}” — the item stays on the follow-up list.</p>
-              <p style={{margin:"0 0 14px"}}><strong>Stop chasing, flag for attorney review:</strong> “{DOC_REASONS.doesnt_apply}”, “{DOC_REASONS.didnt_file}”, and “{DOC_REASONS.dont_have_copy}” (softer chase).</p>
+              <p style={{margin:"0 0 14px"}}><strong>Stop chasing, flag for law firm review:</strong> “{DOC_REASONS.doesnt_apply}”, “{DOC_REASONS.didnt_file}”, and “{DOC_REASONS.dont_have_copy}” (softer chase).</p>
               <p style={{margin:0}}><strong>One per asset:</strong> valuation reports, mortgage statements, and vehicle titles generate one checklist item per property or vehicle.</p>
             </div>
           </div>
