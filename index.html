@@ -2593,13 +2593,19 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
   const EMAIL_TASKS={
     "Send the intake link":{tpl:"Intake Form Link",subject:"Your secure intake form — McCune Legal",body:(l)=>"Hi "+l.firstName+",\n\nThank you for reaching out to McCune Legal. To get started, please complete our secure intake form at the link below. It walks you through everything we need and lets you upload documents as you go.\n\nhttps://intake.mccunelegal.com/form/lead-intake\n\nIf you have any questions along the way, just reply to this email or call our office.\n\nMatt McCune"},
     "Approve follow-up email — intake not completed":{tpl:"Intake Follow-Up",subject:"Quick reminder — your intake form is waiting",body:(l)=>"Hi "+l.firstName+",\n\nJust a friendly reminder that your intake form is still waiting for you. Completing it is the first step toward getting your case moving, and it usually takes about 20 minutes.\n\nhttps://intake.mccunelegal.com/form/lead-intake\n\nIf you've run into any trouble with the form or have questions, reply here and we'll help.\n\nMatt McCune"},
-    "Review & approve AI intake report email":{tpl:"AI Intake Report",subject:"Your intake review — McCune Legal",body:(l)=>"Hi "+l.firstName+",\n\nThank you for completing your intake. We've reviewed everything you submitted, and your personalized intake report is attached.\n\n[AI intake report — see the lead's Intake Package tab for the full report]\n\nWe'll be in touch about next steps. If anything in the report looks off, or you have questions, reply here or call our office.\n\nMatt McCune"},
+    "Review & approve AI intake report email":{tpl:"AI Intake Report",subject:"Your intake review — McCune Legal",body:(l)=>"Hi "+l.firstName+",\n\nThank you for completing your intake. We've reviewed everything you submitted, and your personalized intake report is attached.\n\n[Attached: Intake-Package.pdf — your personalized intake report]\n\nWe'll be in touch about next steps. If anything in the report looks off, or you have questions, reply here or call our office.\n\nMatt McCune"},
   };
   const openTask=(t)=>{
     if(t.batchDigest){window.__leadTab="documents";setSelectedLead(t.leadId);setPage("lead-detail");return;}
     if(t.title==="Approve document follow-up request"){window.__leadTab="documents";window.__docFilter="awaiting";setSelectedLead(t.leadId);setPage("lead-detail");return;}
     if(EMAIL_TASKS[t.title]){setTaskModal(t);return;}
     setSelectedLead(t.leadId);setPage("lead-detail");
+  };
+  const viewPkgPdf=(l)=>{
+    const pkg=l.intakePackage||DEMO_INTAKE_PACKAGES[l.email];
+    if(!pkg)return;
+    const w=window.open("","_blank","width=860,height=940");
+    w.document.write(buildIntakePackageHtml(l,pkg));w.document.close();w.focus();
   };
   const approveTaskEmail=(t)=>{
     const spec=EMAIL_TASKS[t.title];if(!spec)return;
@@ -2854,6 +2860,16 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
                 <span style={{color:"#999",fontWeight:600}}>To</span><span style={{color:"#434343"}}>{l.firstName} {l.lastName} &lt;{l.email||"no email on file"}&gt;</span>
                 <span style={{color:"#999",fontWeight:600}}>Subject</span><span style={{color:"#434343",fontWeight:600}}>{spec.subject}</span>
               </div>
+              {spec.tpl==="AI Intake Report"&&(l.intakePackage||DEMO_INTAKE_PACKAGES[l.email])&&(
+                <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:"#f4f7f2",border:"1px solid #d5e2d7",borderRadius:8,marginBottom:14}}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke="#3d5c43" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:12.5,fontWeight:700,color:"#3d5c43"}}>Intake-Package-{l.firstName}-{l.lastName}.pdf</div>
+                    <div style={{fontSize:11,color:"#7a9c80"}}>Attachment — this is the report the debtor will receive</div>
+                  </div>
+                  <button onClick={()=>viewPkgPdf(l)} style={{padding:"6px 14px",fontSize:12,fontWeight:700,borderRadius:5,cursor:"pointer",border:"none",background:"#3d5c43",color:"#fff",flexShrink:0}}>View PDF</button>
+                </div>
+              )}
               <div style={{background:"#FBFAF7",border:"1px solid #eee",borderRadius:8,padding:"14px 16px",fontSize:13,color:"#555",lineHeight:1.65,whiteSpace:"pre-wrap"}}>{spec.body(l)}</div>
             </div>
             <div style={{padding:"14px 24px",borderTop:"1px solid #eee",display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}>
