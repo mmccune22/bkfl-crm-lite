@@ -690,8 +690,8 @@ const leadStageColors={
 };
 
 function useLocalLeads(){
-  const [leads,setLeads]=useState(()=>{try{const s=localStorage.getItem("bkfl_lite_leads_v12");return s?JSON.parse(s):INITIAL_LEADS;}catch{return INITIAL_LEADS;}});
-  useEffect(()=>{localStorage.setItem("bkfl_lite_leads_v12",JSON.stringify(leads));},[leads]);
+  const [leads,setLeads]=useState(()=>{try{const s=localStorage.getItem("bkfl_lite_leads_v13");return s?JSON.parse(s):INITIAL_LEADS;}catch{return INITIAL_LEADS;}});
+  useEffect(()=>{localStorage.setItem("bkfl_lite_leads_v13",JSON.stringify(leads));},[leads]);
   return [leads,setLeads];
 }
 
