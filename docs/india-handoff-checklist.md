@@ -32,7 +32,14 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
 - ✅ Joint filers: one intake, primary contact only; spouse doc rules
 - ✅ Stages are system-driven, never hand-edited; 3 stages in v1
 - ✅ Every AI email requires law-firm approval; every document requires firm approval (AI is a recommendation)
-- ✅ Task doorway model: click shows the work; doing the work completes the task; NO mark-complete shortcut (removed by design — review is mandatory); Removed keeps history
+- ✅ Universal task rules — apply to ALL five task types, and to every future one:
+  1. Tasks are created by the system (events or the 5:00 a.m. batch), never by hand
+  2. An outstanding task has exactly two exits: open it and do the work, or remove it — no mark-complete shortcut exists
+  3. Opening a task always shows the actual work (email draft + attachment, or document review lanes)
+  4. Doing the work completes the task automatically — approve = send + log to Communications + timeline + stage advance + recurrence re-arm, via one shared rulebook (buildApprovalPatch)
+  5. Completed and Removed are permanent, read-only history; Removed can be restored to Outstanding
+  6. Recurring tasks re-arm only while their trigger condition still holds
+  7. Per-type differences are parameters only (trigger, cadence, doorway destination) — never rule exceptions
 - 🔶 5:00 a.m. single batch window — stated in-app; put the one-clock rule in the spec explicitly
 - ✅ Communications come from the firm, not an individual; no custom template builder in v1
 
