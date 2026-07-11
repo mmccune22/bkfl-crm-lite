@@ -43,6 +43,8 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
   8. Every Task type has a firm-level On/Off switch (Settings → Tasks). Off means off for everything: every open copy of that Task (all Leads) moves to Task history as Removed, and the system stops creating new ones — restorable individually per the history rule. Templates have no switch of their own — every email leaves the system through a Task, so the Task switch IS the email switch
 - 🔶 5:00 a.m. single batch window — stated in-app; put the one-clock rule in the spec explicitly
 - ✅ Communications come from the firm, not an individual; no custom template builder in v1
+- ✅ Design principle: every AI-driven feature ships with a firm-level Off switch — some lawyers will want any given AI step turned off, and that must always be possible without removing the feature for everyone. The per-Task switches are the v1 implementation; apply the same principle to every future AI feature
+- ✅ AI disclaimer: the AI Intake Summary carries a preliminary-review disclaimer in BOTH the email body and the attached PDF (the PDF travels alone) — AI-assisted, preliminary only, not legal advice, attorney will personally review, figures may change
 
 ## 5. Enterprise / Non-Functional (mostly undiscussed — decide before handoff)
 - ⬜ Security & compliance: encryption at rest/in transit, privilege considerations, data retention/deletion policy, audit logging
