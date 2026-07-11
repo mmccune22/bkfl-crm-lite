@@ -2152,7 +2152,18 @@ function SettingsPage(){
   const [confirm,confirmModal]=useConfirm();
   const [settingsTab,setSettingsTab]=useState("organization");
   const [taskToggles,setTaskTogglesUi]=useState(getTaskToggles());
-  const flipTask=(key)=>{const en=taskToggles[key]!==false;setTaskEnabled(key,!en);setTaskTogglesUi(getTaskToggles());};
+  const [toggleLeads,setToggleLeads]=useLocalLeads();
+  const flipTask=async(key)=>{
+    const en=taskToggles[key]!==false;
+    if(en){
+      const ok=await confirm({title:"Turn Off Task",message:"Turn this Task off? Every open copy, on every Lead, moves to the Task history as Removed, and the system stops creating new ones. Removed Tasks can be restored from the Lead\u2019s Tasks tab.",confirmLabel:"Turn Off"});
+      if(!ok)return;
+      const _d=new Date().toISOString().split("T")[0];
+      setToggleLeads(prev=>prev.map(l=>({...l,tasks:(l.tasks||[]).map(tk=>tk.status==="Pending"&&(tk.title===key||(key==="Review submitted documents"&&tk.batchDigest))?{...tk,status:"Removed",removedDate:_d}:tk)})));
+    }
+    setTaskEnabled(key,!en);
+    setTaskTogglesUi(getTaskToggles());
+  };
   const [org,setOrg]=useState(()=>{
     try{const s=localStorage.getItem("bkfl_lite_org_v1");return s?JSON.parse(s):{name:"McCune Legal",phone:"(303) 759-0728",website:"",street:"2101 Pearl St.",city:"Boulder",state:"CO",country:"United States",zip:"80302",logo:null};}
     catch{return{name:"McCune Legal",phone:"(303) 759-0728",website:"",street:"2101 Pearl St.",city:"Boulder",state:"CO",country:"United States",zip:"80302",logo:null};}
@@ -2410,7 +2421,7 @@ function SettingsPage(){
 
       {settingsTab==="tasks"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#666",marginBottom:16}}>Five pre-set Tasks run the whole intake process. Every Task is one decision and one click — the AI does the work, a person approves it. There is no mark-complete shortcut: a Task ends by being done, or by being removed. Nothing happens without review. Each Task type also has an On/Off switch: Off stops the system from creating that Task — Tasks already open are not affected. Because every email leaves the system through a Task, turning a Task off also turns off its email.</p>
+          <p style={{fontSize:13,color:"#666",marginBottom:16}}>Five pre-set Tasks run the whole intake process. Every Task is one decision and one click — the AI does the work, a person approves it. There is no mark-complete shortcut: a Task ends by being done, or by being removed. Nothing happens without review. Each Task type also has an On/Off switch. Off means off for everything: every open copy of that Task moves to the Task history as Removed, and the system stops creating new ones. Because every email leaves the system through a Task, turning a Task off also turns off its email.</p>
           {[
             {title:"Send the intake link",stage:"New Lead",created:"Automatically, when a new Lead is created without “Send Intake Form Link” checked — the intake email hasn’t gone out, so sending it becomes the first Task",repeats:"Never — a one-time Task. It stays open until the link is sent, so a new Lead can't sit silently. The law firm can also remove it, which closes it as Removed in the Task history",desc:"To send the link, open the Task — from Dashboard → Outstanding Tasks, or from the Lead's Tasks tab — and click Approve & Send on the draft. That one click sends the “Intake Form Link” template email (see Settings → Communications) and completes this Task."},
             {title:"Approve follow-up email — intake not completed",stage:"Intake Sent",created:"1 week after the intake link is sent",repeats:"Weekly, until the debtor submits the intake",desc:"The AI drafts a reminder email nudging the debtor to complete their intake form. The law firm reviews and approves it before it goes out. When the debtor submits, any open copy of this Task is closed automatically."},
@@ -2440,7 +2451,7 @@ function SettingsPage(){
                   </span>
                 </span>
               </div>
-              {!enabled&&<div style={{background:"#fdf0ef",borderBottom:"1px solid #f0d8d5",padding:"8px 20px",fontSize:12.5,color:"#C0392B",fontWeight:600}}>Off — the system will not create this Task. Tasks already in Outstanding are not affected: they can still be approved or removed.</div>}
+              {!enabled&&<div style={{background:"#fdf0ef",borderBottom:"1px solid #f0d8d5",padding:"8px 20px",fontSize:12.5,color:"#C0392B",fontWeight:600}}>Off — every open copy of this Task was moved to the Task history as Removed (restorable from the Lead’s Tasks tab), and the system will not create new ones.</div>}
               <div style={{padding:"14px 20px",opacity:enabled?1:0.45}}>
                 <div style={{display:"grid",gridTemplateColumns:"110px 1fr",rowGap:6,columnGap:12,fontSize:13,marginBottom:10}}>
                   <span style={{color:"#999",fontWeight:600}}>Created</span><span style={{color:"#555"}}>{task.created}</span>
