@@ -40,6 +40,7 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
   5. Completed and Removed are permanent, read-only history; Removed can be restored to Outstanding
   6. Recurring tasks re-arm only while their trigger condition still holds
   7. Per-type differences are parameters only (trigger, cadence, doorway destination) — never rule exceptions
+  8. Every Task type has a firm-level On/Off switch (Settings → Tasks). Off stops the system from creating that Task; Tasks already open are untouched, and recurrence simply doesn't re-arm. Templates have no switch of their own — every email leaves the system through a Task, so the Task switch IS the email switch
 - 🔶 5:00 a.m. single batch window — stated in-app; put the one-clock rule in the spec explicitly
 - ✅ Communications come from the firm, not an individual; no custom template builder in v1
 
