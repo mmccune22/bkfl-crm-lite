@@ -1194,7 +1194,6 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const addNote=()=>{if(!newNote.trim())return;update({notes:[{id:Date.now(),date:new Date().toISOString().split("T")[0],author:"Matt McCune",text:newNote},...lead.notes]});setNewNote("");};
   const addTask=()=>{if(!newTaskTitle.trim())return;const taskId=Date.now();const isClient=lead.contacts.some(c=>(c.role==="Client"||c.role==="Lead")&&c.name===newTaskAssignee);update({tasks:[...lead.tasks,{id:taskId,title:newTaskTitle,description:newTaskDesc,due:newTaskDue,status:"Pending",assignee:newTaskAssignee,assignedBy:"Matt McCune",completedDate:""}]});const savedAssignee=newTaskAssignee;const savedTitle=newTaskTitle;setNewTaskTitle("");setNewTaskDue("");setNewTaskDesc("");setNewTaskAssignee("Matt McCune");setShowNewTask(false);if(isClient){setTaskNotifyPopup({taskId,assignee:savedAssignee,title:savedTitle});}};
   const addBuiltTask=()=>{if(!selectedBuiltTask)return;const bt=BUILT_TASKS.find(t=>t.title===selectedBuiltTask);if(!bt)return;const taskId=Date.now();const isClient=lead.contacts.some(c=>(c.role==="Client"||c.role==="Lead")&&c.name===builtTaskAssignee);update({tasks:[...lead.tasks,{id:taskId,title:bt.title,description:"",due:builtTaskDue,status:"Pending",assignee:builtTaskAssignee,assignedBy:"Matt McCune",completedDate:""}]});const savedAssignee=builtTaskAssignee;const savedTitle=bt.title;setSelectedBuiltTask("");setBuiltTaskDue("");setBuiltTaskAssignee("Matt McCune");setShowNewTask(false);if(isClient){setTaskNotifyPopup({taskId,assignee:savedAssignee,title:savedTitle});}};
-  const toggleTask=(id)=>update({tasks:lead.tasks.map(t=>t.id===id?{...t,status:t.status==="Completed"?"Pending":"Completed",completedDate:t.status==="Completed"?"":new Date().toISOString().split("T")[0]}:t)});
   const deleteTask=async(id)=>{if(await confirm({title:"Remove Task",message:"Remove this task without completing it? It stays in the task history as Removed.",confirmLabel:"Remove"}))update({tasks:lead.tasks.map(t=>t.id===id?{...t,status:"Removed",removedDate:new Date().toISOString().split("T")[0]}:t)});};
   const sendEmail=()=>{if(!emailBody.trim()||!emailSubject.trim())return;const newComm={id:Date.now(),date:new Date().toISOString().split("T")[0],type:"Email",direction:"Outgoing",subject:emailSubject,body:emailBody,to:lead.firstName+" "+lead.lastName,email:lead.email||""};update({communications:[newComm,...lead.communications]});setEmailBody("");setEmailSubject("");setShowEmailCompose(false);};
   const addEvent=()=>{if(!newEvTitle.trim()||!newEvStartDate)return;const ev={id:Date.now(),title:newEvTitle,date:newEvStartDate,endDate:newEvEndDate||newEvStartDate,time:newEvAllDay?"All day":newEvStartTime||"",endTime:newEvAllDay?"All day":newEvEndTime||"",allDay:newEvAllDay,location:newEvLocation,assignee:newEvAssignee};update({calendarEvents:[...(lead.calendarEvents||[]),ev]});setNewEvTitle("");setNewEvStartDate("");setNewEvStartTime("");setNewEvEndDate("");setNewEvEndTime("");setNewEvAllDay(false);setNewEvLocation("");setNewEvAssignee("Matt McCune");setShowNewEvent(false);};
@@ -1594,7 +1593,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                   return(<React.Fragment key={task.id}>
                   <tr style={{borderBottom:taskNotify===task.id?"none":"1px solid #f0f0f0"}} onMouseEnter={e=>e.currentTarget.style.background="#f2f3ef"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                     <td style={{padding:"12px 14px",width:36}}>
-                      <div onClick={()=>toggleTask(task.id)} style={{width:20,height:20,borderRadius:"50%",border:"2px solid "+(task.status==="Completed"?"#7A9C80":"#7a9c80"),background:task.status==="Completed"?"#7A9C80":"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+                      <div title={task.status==="Completed"?"Completed":"Outstanding — work this task from Dashboard → Outstanding Tasks"} style={{width:20,height:20,borderRadius:"50%",border:"2px solid #7A9C80",background:task.status==="Completed"?"#7A9C80":"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
                         {task.status==="Completed"&&<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                       </div>
                     </td>
@@ -2400,7 +2399,7 @@ function SettingsPage(){
 
       {settingsTab==="tasks"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#666",marginBottom:16}}>Five pre-set tasks run the whole intake process. Every task is one decision and one click — the AI does the work, a person approves it.</p>
+          <p style={{fontSize:13,color:"#666",marginBottom:16}}>Five pre-set tasks run the whole intake process. Every task is one decision and one click — the AI does the work, a person approves it. There is no mark-complete shortcut: a task ends by being done, or by being removed. Nothing happens without review.</p>
           {[
             {title:"Send the intake link",stage:"New Lead",created:"Automatically, when a new lead is created without “Send Intake Form Link” checked — the intake email hasn’t gone out, so sending it becomes the first task",repeats:"Never — a one-time task. It stays open until the link is sent, so a new lead can't sit silently. The law firm can also remove it, which closes it as Removed in the task history",desc:"The task completes itself the moment the link is sent — either by opening the task in Dashboard → Outstanding Tasks and clicking Approve & Send on the draft, or by clicking Send Intake Link at the top of the lead (Leads → open the lead; the button shows while the lead is in New Lead). Both clicks are the same action: they send the “Intake Form Link” template email (see Settings → Communications) and close this task. Templates are pre-drafted for the law firm in this version — there is no custom template builder yet."},
             {title:"Approve follow-up email — intake not completed",stage:"Intake Sent",created:"1 week after the intake link is sent",repeats:"Weekly, until the debtor submits the intake",desc:"The AI drafts a reminder email nudging the debtor to complete their intake form. The law firm reviews and approves it before it goes out. When the debtor submits, any open copy of this task is closed automatically."},
@@ -2703,17 +2702,6 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
       return {...l,tasks};
     }));
   };
-  const completeTask=async(t)=>{
-    if(!(await confirm({title:"Mark Complete",message:'Mark "'+t.title+'" complete without opening it? Use this when it was handled outside the system.',confirmLabel:"Mark Complete"})))return;
-    setLeads(prev=>prev.map(l=>{
-    if(l.id!==t.leadId)return l;
-    let tasks=(l.tasks||[]).map(tk=>tk.id===t.id?{...tk,status:"Completed",completedDate:todayISO}:tk);
-    if(t.recurring&&l.leadStage===t.stage){
-      const next=new Date(Date.now()+7*86400000).toISOString().split("T")[0];
-      tasks=[{...t,id:Date.now(),status:"Pending",due:next,completedDate:undefined},...tasks];
-    }
-    return {...l,tasks};
-  }));};
 
 
   const quickLinks=[
@@ -2835,7 +2823,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
           </div>
           <div style={{padding:"8px 20px",borderBottom:"1px solid #f0f0f0",fontSize:11.5,color:"#999",fontStyle:"italic",background:"#FBFAF7"}}>Your approval queue — nothing is sent to a client without you.</div>
           <div style={{display:"flex",gap:10,alignItems:"center",padding:"6px 14px",borderBottom:"1px solid #eee",background:"#FBFAF7"}}>
-            <div style={{width:60,flexShrink:0,fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:0.5}}>Complete</div>
+            <div style={{width:60,flexShrink:0,fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:0.5}}>Review</div>
             <div style={{flex:1,fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:0.5}}>Task</div>
             <div style={{width:78,flexShrink:0,fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:0.5,textAlign:"right"}}>Due</div>
             <div style={{width:56,flexShrink:0,fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:0.5,textAlign:"right"}}>Remove</div>
@@ -2845,7 +2833,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
             tasks.map((t,i)=>(
               <div key={i} onClick={()=>openTask(t)} style={{display:"flex",gap:10,padding:"8px 14px",borderBottom:"1px solid #f5f5f5",cursor:"pointer",alignItems:"center"}} onMouseEnter={e=>e.currentTarget.style.background="#f2f3ef"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                 <div style={{width:60,flexShrink:0}}>
-                  <div onClick={e=>{e.stopPropagation();completeTask(t);}} title="Mark complete" style={{width:18,height:18,borderRadius:"50%",border:"2px solid #7a9c80",cursor:"pointer",background:"transparent"}} onMouseEnter={e=>{e.currentTarget.style.background="#dce8de";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}/>
+                  <div title="Open to review & approve" style={{width:18,height:18,borderRadius:"50%",border:"2px solid #7a9c80",background:"transparent"}}/>
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:12,fontWeight:500,color:"#434343",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{t.title}</div>

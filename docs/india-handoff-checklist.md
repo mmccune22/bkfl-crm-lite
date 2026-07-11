@@ -32,7 +32,7 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
 - ✅ Joint filers: one intake, primary contact only; spouse doc rules
 - ✅ Stages are system-driven, never hand-edited; 3 stages in v1
 - ✅ Every AI email requires law-firm approval; every document requires firm approval (AI is a recommendation)
-- ✅ Task doorway model: click shows the work; doing the work completes the task; circle = confirmed override; Removed keeps history
+- ✅ Task doorway model: click shows the work; doing the work completes the task; NO mark-complete shortcut (removed by design — review is mandatory); Removed keeps history
 - 🔶 5:00 a.m. single batch window — stated in-app; put the one-clock rule in the spec explicitly
 - ✅ Communications come from the firm, not an individual; no custom template builder in v1
 
