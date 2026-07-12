@@ -1456,11 +1456,11 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                   ?<span style={{marginLeft:10,background:"#F59E0B",color:"#fff",borderRadius:10,padding:"1px 8px",fontSize:11,fontWeight:700,verticalAlign:"2px"}}>{queue.length} to review</span>
                   :checklist.length>0?<span style={{marginLeft:10,background:"#7a9c80",color:"#fff",borderRadius:10,padding:"1px 8px",fontSize:11,fontWeight:700,verticalAlign:"2px"}}>review complete</span>:null}
               </div>
-              {checklist.length>0&&<span style={{position:"absolute",right:20,top:"50%",transform:"translateY(-50%)",fontSize:12,color:"#999"}}>{checklist.length-queue.length} of {checklist.length} resolved</span>}
+              {checklist.length>0&&<span style={{marginLeft:10,fontSize:12,color:"#999",whiteSpace:"nowrap"}}>{"\u00b7"} {checklist.length-queue.length} of {checklist.length} resolved</span>}
               {checklist.length===0?(
                 <div style={{padding:24,textAlign:"center",color:"#999",fontSize:13,lineHeight:1.6}}>The Document checklist is created automatically when the debtor submits their intake.</div>
               ):(
-              <div style={{display:"grid",gridTemplateColumns:"5fr 8fr 5fr",alignItems:"stretch",height:620}}>
+              <div style={{display:"grid",gridTemplateColumns:"minmax(0,5fr) minmax(0,8fr) minmax(0,5fr)",alignItems:"stretch",height:620}}>
 
                 <div style={{borderRight:"1px solid #eee",display:"flex",flexDirection:"column",minHeight:0}}>
                   <div id="col-chase" style={{height:64,boxSizing:"border-box",padding:"0 14px",display:"flex",flexDirection:"column",justifyContent:"center",borderBottom:"1px solid #f0f0ed",background:"#fdf0ef"}}>
@@ -1471,7 +1471,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                     {chase.length===0&&<div style={{fontSize:11.5,color:"#ccc",textAlign:"center",padding:"18px 6px",lineHeight:1.5}}>Nothing to chase {"\u2014"} rejections and Keep Chasing rulings land here.</div>}
                     {chase.map(d=>{return(
                       <div key={d.id} id={"chasecard-"+d.id} style={{border:"1px solid #eee",borderRadius:8,padding:"9px 11px",marginBottom:7,background:"#fff"}}>
-                        <div style={{fontSize:13,fontWeight:600,color:"#434343"}}>{dName(d)}</div>
+                        <div style={{fontSize:13,fontWeight:600,color:"#434343",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dName(d)}</div>
                         <div title={d.note||""} style={{fontSize:11.5,color:"#999",margin:"3px 0 6px",lineHeight:1.4,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{d.reason==="rejected"?<span style={{color:"#a94438"}}>Rejected{d.note?" \u2014 "+d.note:""}</span>:(d.reason&&DOC_REASONS[d.reason]?"Debtor: \u201c"+DOC_REASONS[d.reason]+"\u201d":(d.requestedDate?"Requested "+d.requestedDate:"Never uploaded"))}</div>
                         <div style={{display:"flex",gap:6}}>
                           <button onClick={()=>pickFile(nm=>patchDoc(d.id,{status:"ai_accepted",aiNote:"Passed AI analysis",fileName:nm,date:today,reason:undefined,note:undefined}))} style={btn}>Upload</button>
@@ -1517,7 +1517,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                     {queue.map(d=>{return(
                       <div key={d.id} id={"doccard-"+d.id} style={{border:"1px solid #e4e4df",borderRadius:8,padding:"10px 12px",marginBottom:8,background:"#fff",transition:"opacity 0.22s ease, transform 0.22s ease",opacity:leavingDoc===d.id?0:1,transform:leavingDoc===d.id?("translateX("+(leavingDir==="left"?"-60px":"60px")+")"):"none"}}>
                         <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",marginBottom:3}}>
-                          <span style={{fontSize:13.5,fontWeight:700,color:"#434343"}}>{dName(d)}</span>
+                          <span style={{fontSize:13.5,fontWeight:700,color:"#434343",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dName(d)}</span>
                           {d.manual&&<span style={{fontSize:9.5,color:"#999"}}>(added by staff)</span>}
                         </div>
                         {d.status==="ai_accepted"&&<div style={{fontSize:12,color:"#7a9c80",fontWeight:600,margin:"0 0 6px",lineHeight:1.45}}>AI accepted {"\u2014"} waiting on your approval</div>}
