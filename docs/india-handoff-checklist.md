@@ -41,6 +41,8 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
   6. Recurring tasks re-arm only while their trigger condition still holds
   7. Per-type differences are parameters only (trigger, cadence, doorway destination) — never rule exceptions
   8. Every Task type has a firm-level On/Off switch (Settings → Tasks). Off means off for everything: every open copy of that Task (all Leads) moves to Task history as Removed, and the system stops creating new ones — restorable individually per the history rule. Templates have no switch of their own — every email leaves the system through a Task, so the Task switch IS the email switch
+- ✅ Submission locks the intake: the Intake Package is an immutable point-in-time record (the AI Summary and attorney review are anchored to it). Post-submission documents and corrections enter ONLY through the document-upload doorway or a communication to the firm — never by re-entering the intake form
+- ✅ Document review is ONE Task type with two triggers (rule 7: parameters, not new types): created immediately at submission for the Documents that came in with the intake, and by the 5:00 a.m. batch for post-submission uploads; the dedupe rule keeps at most one open pile per Lead — the batch refreshes the count on an existing open Task
 - 🔶 5:00 a.m. single batch window — stated in-app; put the one-clock rule in the spec explicitly
 - ✅ Communications come from the firm, not an individual; no custom template builder in v1
 - ✅ Templates own the words; Tasks own the timing — every schedule is stated in exactly one place (the Task card / task-creation rules); Communications templates have no schedule of their own and defer to their Task
