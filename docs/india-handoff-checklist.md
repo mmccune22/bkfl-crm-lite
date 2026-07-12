@@ -9,7 +9,7 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
 - ✅ Brand assets — logo, palette, typography (in the repos)
 
 ## 2. Specifications
-- 🔶 Intake Flow Spec v1 (docs/bkfl-intake-flow-spec-v1.docx) — predates most of the system; needs a v2 pass covering: 3-stage model, six-task rulebook, document pipeline states, AI Intake Summary vs. Intake Package, Removed-task history, firm-voice communications
+- 🔶 Intake Flow Spec v1 (docs/bkfl-intake-flow-spec-v1.docx) — predates most of the system; needs a v2 pass covering: 4-stage model (incl. Ready for Petition Prep + regression rule), six-task rulebook, document pipeline states, AI Intake Summary vs. Intake Package, Removed-task history, firm-voice communications
 - ⬜ Architecture one-pager — four layers (data / orchestrator / agents / presentation), event list, agent roster with inputs & outputs (parked as task; write when both windows feel done)
 - 🔶 Task rulebook — fully written, but it lives in the app (Settings → Tasks + Lead Stages); extract into the spec verbatim
 - 🔶 Document pipeline rules — same: Settings → Documents (32-type catalog, requirement tiers, reason codes, follow-up rules, category lifecycle) is the source of truth; extract
