@@ -1366,7 +1366,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
           const pendingRulings=buckets.missing.filter(isPendingRuling).length;
           const toReview=buckets.required.length+buckets.requested.length;
           const availableToRequest=DOC_TYPES.filter(dt=>!checklist.some(c=>c.docId===dt.id));
-          const saveReject=(d)=>{setLeavingDir("left");animatePatch(d.id,{status:"open",reason:"rejected",note:rejectNote||"Needs to be re-uploaded",rejectedFile:d.fileName,fileName:undefined,date:undefined,aiNote:undefined});setRejectingDoc(null);setRejectNote("");};
+          const saveReject=(d)=>{flyGhost(d.id,"left");setLeavingDir("left");animatePatch(d.id,{status:"open",reason:"rejected",note:rejectNote||"Needs to be re-uploaded",rejectedFile:d.fileName,fileName:undefined,date:undefined,aiNote:undefined});setRejectingDoc(null);setRejectNote("");};
           const addRequest=()=>{
             if(requestDocId==="custom"&&!requestCustom.trim())return;
             if(!requestDocId)return;
@@ -1407,7 +1407,28 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
           const others=checklist.filter(d=>docMeta(d.docId).req!=="required");
           const needsDecision=(d)=>isUploadedReview(d)||isPendingRuling(d);
           const queue=[...required,...others].filter(needsDecision);
-          const decide=(id,patch,dir)=>{setLeavingDir(dir||"right");animatePatch(id,patch);};
+          const flyGhost=(docId,dir)=>{
+            try{
+              const card=document.getElementById("doccard-"+docId)||document.getElementById("chasecard-"+docId);
+              const dest=document.getElementById(dir==="left"?"col-chase":"col-home");
+              if(!card||!dest)return;
+              const c=card.getBoundingClientRect(),e=dest.getBoundingClientRect();
+              const d=checklist.find(x=>x.id===docId);
+              const ghost=document.createElement("div");
+              ghost.textContent=d?(d.customName||docMeta(d.docId).name):"";
+              const green=dir!=="left";
+              ghost.style.cssText="position:fixed;z-index:100;pointer-events:none;left:"+c.left+"px;top:"+c.top+"px;max-width:"+c.width+"px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 6px 18px rgba(0,0,0,0.18);transition:all 0.5s cubic-bezier(0.35,0.7,0.25,1);"+(green?"background:#eef6ef;border:1px solid #9bba9f;color:#3d5c43;":"background:#fdf0ef;border:1px solid #f0b9b1;color:#a94438;");
+              document.body.appendChild(ghost);
+              requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+                ghost.style.left=(e.left+14)+"px";
+                ghost.style.top=(e.top+e.height+6)+"px";
+                ghost.style.opacity="0";
+                ghost.style.transform="scale(0.8)";
+              });});
+              setTimeout(()=>ghost.remove(),560);
+            }catch(err){}
+          };
+          const decide=(id,patch,dir)=>{flyGhost(id,dir||"right");setLeavingDir(dir||"right");animatePatch(id,patch);};
           const railIcon=(d)=>{
             if(d.status==="approved")return <span style={{color:"#7a9c80",fontWeight:900,fontSize:12,width:14,flexShrink:0}}>{"\u2713"}</span>;
             if(d.status==="excused")return <span style={{color:"#bbb",fontWeight:900,fontSize:12,width:14,flexShrink:0}}>{"\u2014"}</span>;
@@ -1439,17 +1460,17 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               {checklist.length===0?(
                 <div style={{padding:24,textAlign:"center",color:"#999",fontSize:13,lineHeight:1.6}}>The Document checklist is created automatically when the debtor submits their intake.</div>
               ):(
-              <div style={{display:"grid",gridTemplateColumns:"5fr 8fr 5fr",alignItems:"start"}}>
+              <div style={{display:"grid",gridTemplateColumns:"5fr 8fr 5fr",alignItems:"stretch"}}>
 
                 <div style={{borderRight:"1px solid #eee",display:"flex",flexDirection:"column",minHeight:380}}>
-                  <div style={{padding:"11px 14px",borderBottom:"1px solid #f0f0ed",background:"#fdf0ef"}}>
+                  <div id="col-chase" style={{padding:"11px 14px",borderBottom:"1px solid #f0f0ed",background:"#fdf0ef"}}>
                     <div style={{fontSize:13,fontWeight:700,color:"#a94438",textTransform:"uppercase",letterSpacing:"0.5px"}}>Missing {"\u2014"} To Chase <span style={{background:"#dc3545",color:"#fff",borderRadius:10,padding:"0px 8px",fontSize:11,marginLeft:4}}>{chase.length}</span></div>
                     <div style={{fontSize:11.5,color:"#c07267",marginTop:2}}>Not uploaded, rejected, or missing {"\u2014"} we will request these in the follow-up email</div>
                   </div>
                   <div style={{flex:1,padding:"10px 12px",maxHeight:480,overflowY:"auto"}}>
                     {chase.length===0&&<div style={{fontSize:11.5,color:"#ccc",textAlign:"center",padding:"18px 6px",lineHeight:1.5}}>Nothing to chase {"\u2014"} rejections and Keep Chasing rulings land here.</div>}
                     {chase.map(d=>{return(
-                      <div key={d.id} style={{border:"1px solid #eee",borderRadius:8,padding:"9px 11px",marginBottom:7,background:"#fff"}}>
+                      <div key={d.id} id={"chasecard-"+d.id} style={{border:"1px solid #eee",borderRadius:8,padding:"9px 11px",marginBottom:7,background:"#fff"}}>
                         <div style={{fontSize:13,fontWeight:600,color:"#434343"}}>{dName(d)}</div>
                         <div style={{fontSize:11.5,color:"#999",margin:"3px 0 6px",lineHeight:1.4}}>{d.reason==="rejected"?<span style={{color:"#a94438"}}>Rejected{d.note?" \u2014 "+d.note:""}</span>:(d.reason&&DOC_REASONS[d.reason]?"Debtor: \u201c"+DOC_REASONS[d.reason]+"\u201d":(d.requestedDate?"Requested "+d.requestedDate:"Never uploaded"))}</div>
                         <div style={{display:"flex",gap:6}}>
@@ -1494,7 +1515,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                       </div>
                     )}
                     {queue.map(d=>{return(
-                      <div key={d.id} style={{border:"1px solid #e4e4df",borderRadius:8,padding:"10px 12px",marginBottom:8,background:"#fff",transition:"opacity 0.22s ease, transform 0.22s ease",opacity:leavingDoc===d.id?0:1,transform:leavingDoc===d.id?("translateX("+(leavingDir==="left"?"-60px":"60px")+")"):"none"}}>
+                      <div key={d.id} id={"doccard-"+d.id} style={{border:"1px solid #e4e4df",borderRadius:8,padding:"10px 12px",marginBottom:8,background:"#fff",transition:"opacity 0.22s ease, transform 0.22s ease",opacity:leavingDoc===d.id?0:1,transform:leavingDoc===d.id?("translateX("+(leavingDir==="left"?"-60px":"60px")+")"):"none"}}>
                         <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",marginBottom:3}}>
                           <span style={{fontSize:13.5,fontWeight:700,color:"#434343"}}>{dName(d)}</span>
                           {d.status==="ai_accepted"&&<span style={{fontSize:11.5,fontWeight:700,color:"#7a9c80"}}>AI accepted</span>}
@@ -1532,7 +1553,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                 </div>
 
                 <div style={{display:"flex",flexDirection:"column",minHeight:380}}>
-                  <div style={{padding:"11px 14px",borderBottom:"1px solid #f0f0ed",background:"#eef6ef"}}>
+                  <div id="col-home" style={{padding:"11px 14px",borderBottom:"1px solid #f0f0ed",background:"#eef6ef"}}>
                     <div style={{fontSize:13,fontWeight:700,color:"#3d5c43",textTransform:"uppercase",letterSpacing:"0.5px"}}>Home Base <span style={{background:"#7a9c80",color:"#fff",borderRadius:10,padding:"0px 8px",fontSize:11,marginLeft:4}}>{buckets.home.length}</span></div>
                     <div style={{fontSize:11.5,color:"#5a7c60",marginTop:2}}>Uploaded, approved, category closed</div>
                   </div>
