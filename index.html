@@ -1475,7 +1475,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               <div style={{borderBottom:"1px solid #eee"}}>
                 <div style={{height:64,boxSizing:"border-box",padding:"0 18px",display:"flex",flexDirection:"column",justifyContent:"center",borderBottom:"1px solid #f0f0ed",background:"#fdf6e7"}}>
                   <div style={{fontSize:13,fontWeight:700,color:"#856404",textTransform:"uppercase",letterSpacing:"0.5px"}}>To Review <span style={{background:"#F59E0B",color:"#fff",borderRadius:10,padding:"0px 8px",fontSize:11,marginLeft:4}}>{queue.length}</span> <span style={{marginLeft:6,background:"#7a9c80",color:"#fff",borderRadius:4,padding:"1px 8px",fontSize:10,fontWeight:700,letterSpacing:"0.5px"}}>START HERE</span></div>
-                  <div style={{fontSize:11.5,color:"#b8963e",marginTop:2}}>Work down the list {"\u2014"} Approve, Reject, or Not Needed closes each one. Approved or Not Needed drops to Home Base below; missing, not uploaded, or rejected drops to the right.</div>
+                  <div style={{fontSize:11.5,color:"#b8963e",marginTop:2}}>Work down the list: Approve or Not Needed moves it to Home Base and closes the category; Rejected or missing moves to the chase list for the follow-up email.</div>
                 </div>
                 <div style={{maxHeight:212,overflowY:"auto",padding:"12px 18px"}}>
                   {queue.length===0&&(
