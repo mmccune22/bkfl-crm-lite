@@ -1548,7 +1548,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                         {previewDoc===d.id&&d.fileName&&(
                           <div style={{border:"1px dashed #ccc",borderRadius:6,padding:"14px 10px",textAlign:"center",background:"#fbfbf9",marginTop:10}}>
                             <div style={{fontSize:11,fontWeight:600,color:"#666"}}>{d.fileName}</div>
-                            <div style={{fontSize:10,color:"#aaa",marginTop:2}}>Inline PDF preview {"\u2014"} available in the production build</div>
+                            <div style={{fontSize:10,color:"#aaa",marginTop:2}}>Inline preview {"\u2014"} in production this renders the PDF here, with an {"\u201c"}Open full size{"\u201d"} link to a new tab. Never a download.</div>
                           </div>
                         )}
                         {rejectingDoc===d.id&&(

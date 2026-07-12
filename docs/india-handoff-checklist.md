@@ -58,6 +58,7 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
   - The page shows the CHASE LIST served live from the CRM — one upload slot per requested item (files arrive pre-categorized; the no-miscellaneous-pile rule applies to debtors too) plus per-item "I can't provide this" with the reason picker
   - Safeguards: TLS, virus scan, type/size limits, private per-tenant Azure Blob, audit log, uploads stamp the Lead timeline
   - Pipeline on upload: item → AI screen → ai_accepted/ai_flagged → 5:00 a.m. batch → "Review Documents — follow-up uploads" Task
+- ✅ Document viewing rule (View PDF): inline-first, never a download. Click expands an inline preview under the card (first page, fit-width, scrollable) keeping the decision buttons visible; the preview carries one "Open full size" affordance that opens the browser's native PDF viewer in a NEW TAB (Content-Disposition: inline). No pop-up windows, no modals, and NO automatic downloads — files stay in the app, served via short-lived signed URLs from private Blob storage, and every view is audit-logged (who, when). A deliberate Download button is a possible later feature, never the default
 - 🔶 5:00 a.m. single batch window — stated in-app; put the one-clock rule in the spec explicitly
 - ✅ Communications come from the firm, not an individual; no custom template builder in v1
 - ✅ Templates own the words; Tasks own the timing — every schedule is stated in exactly one place (the Task card / task-creation rules); Communications templates have no schedule of their own and defer to their Task
