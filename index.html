@@ -1516,34 +1516,43 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                     )}
                     {queue.map(d=>{return(
                       <div key={d.id} id={"doccard-"+d.id} style={{border:"1px solid #e4e4df",borderRadius:8,padding:"10px 12px",marginBottom:8,background:"#fff",transition:"opacity 0.22s ease, transform 0.22s ease",opacity:leavingDoc===d.id?0:1,transform:leavingDoc===d.id?("translateX("+(leavingDir==="left"?"-60px":"60px")+")"):"none"}}>
-                        <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",marginBottom:3}}>
-                          <span style={{fontSize:13.5,fontWeight:700,color:"#434343",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dName(d)}</span>
-                          {d.manual&&<span style={{fontSize:9.5,color:"#999"}}>(added by staff)</span>}
+                        <div style={{display:"flex",gap:12,alignItems:"center"}}>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3}}>
+                              <span style={{fontSize:13.5,fontWeight:700,color:"#434343",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dName(d)}</span>
+                              {d.manual&&<span style={{fontSize:9.5,color:"#999",flexShrink:0}}>(added by staff)</span>}
+                            </div>
+                            {d.status==="ai_accepted"&&<div style={{fontSize:12,color:"#7a9c80",fontWeight:600,margin:"0 0 8px",lineHeight:1.45}}>AI accepted {"\u2014"} waiting on your approval</div>}
+                            {d.status==="ai_flagged"&&<div style={{fontSize:12,color:"#a94438",fontWeight:600,margin:"0 0 8px",lineHeight:1.45}}>AI flagged {"\u2014"} {d.aiNote||"needs your review"}</div>}
+                            {isPendingRuling(d)&&<div style={{fontSize:12,color:"#856404",fontWeight:600,margin:"0 0 8px",lineHeight:1.45}}>Debtor: {"\u201c"}{DOC_REASONS[d.reason]||d.reason}{"\u201d"} {"\u2014"} your ruling</div>}
+                            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                              {(d.status==="ai_accepted"||d.status==="ai_flagged")&&<React.Fragment>
+                                <button onClick={()=>decide(d.id,{status:"approved",approvedDate:today},"right")} style={{...btn,background:"#7a9c80",color:"#fff",border:"none",padding:"6px 14px",fontSize:11.5}}>{d.status==="ai_flagged"?"Approve Anyway":"Approve"}</button>
+                                <button onClick={()=>{setRejectingDoc(rejectingDoc===d.id?null:d.id);setRejectNote("");}} style={{...btn,color:"#dc3545",border:"1px solid #f5b7b1",padding:"6px 12px",fontSize:11.5}}>Reject</button>
+                                <button onClick={()=>decide(d.id,{status:"excused",reason:"doesnt_apply",excusedDate:today},"right")} style={{...btn,padding:"6px 10px",fontSize:11.5}}>Not Needed</button>
+                              </React.Fragment>}
+                              {d.status==="reason_given"&&<React.Fragment>
+                                <button onClick={()=>decide(d.id,{status:"excused",excusedDate:today},"right")} style={{...btn,color:"#3d5c43",border:"1px solid #9bba9f",padding:"6px 12px",fontSize:11.5}}>Excuse</button>
+                                <button onClick={()=>decide(d.id,{status:"open",reason:undefined},"left")} style={{...btn,color:"#b8963e",border:"1px solid #e5cf8f",padding:"6px 12px",fontSize:11.5}}>Keep Chasing</button>
+                                <button onClick={()=>pickFile(nm=>patchDoc(d.id,{status:"ai_accepted",aiNote:"Passed AI analysis",fileName:nm,date:today,reason:undefined}))} style={{...btn,padding:"6px 10px",fontSize:11.5}}>Upload</button>
+                              </React.Fragment>}
+                            </div>
+                          </div>
+                          {d.fileName&&(
+                            <button onClick={()=>setPreviewDoc(previewDoc===d.id?null:d.id)} title={d.fileName} style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"10px 16px",border:"1px solid "+(previewDoc===d.id?"#7a9c80":"#d8ded9"),borderRadius:8,background:previewDoc===d.id?"#eef6ef":"#fbfbf9",cursor:"pointer"}}>
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#c0392b" strokeWidth="1.6"/><path d="M14 2v6h6" stroke="#c0392b" strokeWidth="1.6"/><text x="7" y="17.5" fontSize="6.5" fontWeight="800" fill="#c0392b" fontFamily="Inter,Arial">PDF</text></svg>
+                              <span style={{fontSize:10,fontWeight:700,color:"#3d5c43"}}>View PDF</span>
+                            </button>
+                          )}
                         </div>
-                        {d.status==="ai_accepted"&&<div style={{fontSize:12,color:"#7a9c80",fontWeight:600,margin:"0 0 6px",lineHeight:1.45}}>AI accepted {"\u2014"} waiting on your approval</div>}
-                        {d.status==="ai_flagged"&&<div style={{fontSize:12,color:"#a94438",fontWeight:600,margin:"0 0 6px",lineHeight:1.45}}>AI flagged {"\u2014"} {d.aiNote||"needs your review"}</div>}
-                        {isPendingRuling(d)&&<div style={{fontSize:12,color:"#856404",fontWeight:600,margin:"0 0 6px",lineHeight:1.45}}>Debtor: {"\u201c"}{DOC_REASONS[d.reason]||d.reason}{"\u201d"} {"\u2014"} your ruling</div>}
-                        {d.fileName?<div onClick={()=>setPreviewDoc(previewDoc===d.id?null:d.id)} style={{fontSize:13,color:"#3d5c43",fontWeight:700,textDecoration:"underline",cursor:"pointer",margin:"2px 0 7px"}}>{d.fileName}</div>:<div style={{fontSize:13,color:"#ccc",fontWeight:600,margin:"2px 0 7px"}}>no file uploaded</div>}
                         {previewDoc===d.id&&d.fileName&&(
-                          <div style={{border:"1px dashed #ccc",borderRadius:6,padding:"14px 10px",textAlign:"center",background:"#fbfbf9",marginBottom:8}}>
+                          <div style={{border:"1px dashed #ccc",borderRadius:6,padding:"14px 10px",textAlign:"center",background:"#fbfbf9",marginTop:10}}>
                             <div style={{fontSize:11,fontWeight:600,color:"#666"}}>{d.fileName}</div>
                             <div style={{fontSize:10,color:"#aaa",marginTop:2}}>Inline PDF preview {"\u2014"} available in the production build</div>
                           </div>
                         )}
-                        <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                          {(d.status==="ai_accepted"||d.status==="ai_flagged")&&<React.Fragment>
-                            <button onClick={()=>decide(d.id,{status:"approved",approvedDate:today},"right")} style={{...btn,background:"#7a9c80",color:"#fff",border:"none",padding:"6px 14px",fontSize:11.5}}>{d.status==="ai_flagged"?"Approve Anyway":"Approve"}</button>
-                            <button onClick={()=>{setRejectingDoc(rejectingDoc===d.id?null:d.id);setRejectNote("");}} style={{...btn,color:"#dc3545",border:"1px solid #f5b7b1",padding:"6px 12px",fontSize:11.5}}>Reject</button>
-                            <button onClick={()=>decide(d.id,{status:"excused",reason:"doesnt_apply",excusedDate:today},"right")} style={{...btn,padding:"6px 10px",fontSize:11.5}}>Not Needed</button>
-                          </React.Fragment>}
-                          {d.status==="reason_given"&&<React.Fragment>
-                            <button onClick={()=>decide(d.id,{status:"excused",excusedDate:today},"right")} style={{...btn,color:"#3d5c43",border:"1px solid #9bba9f",padding:"6px 12px",fontSize:11.5}}>Excuse</button>
-                            <button onClick={()=>decide(d.id,{status:"open",reason:undefined},"left")} style={{...btn,color:"#b8963e",border:"1px solid #e5cf8f",padding:"6px 12px",fontSize:11.5}}>Keep Chasing</button>
-                            <button onClick={()=>pickFile(nm=>patchDoc(d.id,{status:"ai_accepted",aiNote:"Passed AI analysis",fileName:nm,date:today,reason:undefined}))} style={{...btn,padding:"6px 10px",fontSize:11.5}}>Upload</button>
-                          </React.Fragment>}
-                        </div>
                         {rejectingDoc===d.id&&(
-                          <div style={{display:"flex",gap:6,alignItems:"center",marginTop:8}}>
+                          <div style={{display:"flex",gap:6,alignItems:"center",marginTop:10}}>
                             <input autoFocus value={rejectNote} onChange={ev=>setRejectNote(ev.target.value)} onKeyDown={ev=>{if(ev.key==="Enter")saveReject(d);}} placeholder="Why is it being rejected?" style={{flex:1,padding:"7px 9px",fontSize:11.5,border:"1px solid #f5b7b1",borderRadius:6,outline:"none",fontFamily:"inherit",minWidth:0}}/>
                             <button onClick={()=>saveReject(d)} style={{...btn,background:"#dc3545",color:"#fff",border:"none",fontSize:11}}>Reject</button>
                           </div>
