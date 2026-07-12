@@ -737,7 +737,8 @@ const prepAge=(l)=>{if(!l.prepReadyDate)return"\u2014";const d=Math.floor((Date.
 
 function StageBadge({stage}){
   if(!stage) return null;
-  return <span style={{background:"#E7EAE5",color:"#7A9C80",border:"1px solid #9bba9f",borderRadius:4,padding:"2px 10px",fontSize:12,fontWeight:500}}>{stage}</span>;
+  const sc=leadStageColors[stage]||{bg:"#E7EAE5",text:"#7A9C80",border:"#9bba9f"};
+  return <span style={{background:sc.bg,color:sc.text,border:"1px solid "+sc.border,borderRadius:4,padding:"2px 10px",fontSize:12,fontWeight:500}}>{stage}</span>;
 }
 
 /* ─── SIDEBAR ─── */
