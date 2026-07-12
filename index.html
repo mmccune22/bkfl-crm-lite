@@ -1475,7 +1475,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               <div style={{borderBottom:"1px solid #eee"}}>
                 <div style={{height:64,boxSizing:"border-box",padding:"0 18px",display:"flex",flexDirection:"column",justifyContent:"center",borderBottom:"1px solid #f0f0ed",background:"#fdf6e7"}}>
                   <div style={{fontSize:13,fontWeight:700,color:"#856404",textTransform:"uppercase",letterSpacing:"0.5px"}}>To Review <span style={{background:"#F59E0B",color:"#fff",borderRadius:10,padding:"0px 8px",fontSize:11,marginLeft:4}}>{queue.length}</span> <span style={{marginLeft:6,background:"#7a9c80",color:"#fff",borderRadius:4,padding:"1px 8px",fontSize:10,fontWeight:700,letterSpacing:"0.5px"}}>START HERE</span></div>
-                  <div style={{fontSize:11.5,color:"#b8963e",marginTop:2}}>Work down the list: Approve or Not Needed moves it to Home Base and closes the category; Rejected or missing moves to the chase list for the follow-up email.</div>
+                  <div style={{fontSize:11.5,color:"#b8963e",marginTop:2}}>Work down the list: Approve or Excuse moves it to Home Base and closes the category; Rejected or missing moves to the chase list for the follow-up email.</div>
                 </div>
                 <div style={{maxHeight:212,overflowY:"auto",padding:"12px 18px"}}>
                   {queue.length===0&&(
@@ -1499,12 +1499,12 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                         {PdfBtn(d)}
                         <div style={{display:"flex",gap:6,flexShrink:0}}>
                           {(d.status==="ai_accepted"||d.status==="ai_flagged")&&<React.Fragment>
-                            <button onClick={()=>decide(d.id,{status:"approved",approvedDate:today},"home")} style={{...btn,background:"#7a9c80",color:"#fff",border:"none",padding:"5px 13px",fontSize:11.5}}>{d.status==="ai_flagged"?"Approve Anyway":"Approve"}</button>
+                            <button onClick={()=>decide(d.id,{status:"approved",approvedDate:today,approvedAt:Date.now()},"home")} style={{...btn,background:"#7a9c80",color:"#fff",border:"none",padding:"5px 13px",fontSize:11.5}}>{d.status==="ai_flagged"?"Approve Anyway":"Approve"}</button>
                             <button onClick={()=>{setRejectingDoc(rejectingDoc===d.id?null:d.id);setRejectNote("");}} style={{...btn,color:"#dc3545",border:"1px solid #f5b7b1",padding:"5px 11px",fontSize:11.5}}>Reject</button>
-                            <button onClick={()=>decide(d.id,{status:"excused",reason:"doesnt_apply",excusedDate:today},"home")} style={{...btn,padding:"5px 10px",fontSize:11.5}}>Not Needed</button>
+                            <button onClick={()=>decide(d.id,{status:"excused",reason:"doesnt_apply",excusedDate:today,excusedAt:Date.now()},"home")} style={{...btn,padding:"5px 10px",fontSize:11.5}}>Excuse</button>
                           </React.Fragment>}
                           {d.status==="reason_given"&&<React.Fragment>
-                            <button onClick={()=>decide(d.id,{status:"excused",excusedDate:today},"home")} style={{...btn,color:"#3d5c43",border:"1px solid #9bba9f",padding:"5px 11px",fontSize:11.5}}>Excuse</button>
+                            <button onClick={()=>decide(d.id,{status:"excused",excusedDate:today,excusedAt:Date.now()},"home")} style={{...btn,color:"#3d5c43",border:"1px solid #9bba9f",padding:"5px 11px",fontSize:11.5}}>Excuse</button>
                             <button onClick={()=>decide(d.id,{status:"open",reason:undefined},"chase")} style={{...btn,color:"#b8963e",border:"1px solid #e5cf8f",padding:"5px 11px",fontSize:11.5}}>Keep Chasing</button>
                             <button onClick={()=>pickFile(nm=>patchDoc(d.id,{status:"ai_accepted",aiNote:"Passed AI analysis",fileName:nm,date:today,reason:undefined}))} style={{...btn,padding:"5px 10px",fontSize:11.5}}>Upload</button>
                           </React.Fragment>}
@@ -1528,7 +1528,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                     <div style={{fontSize:11.5,color:"#5a7c60",marginTop:2}}>Everything this case requires {"\u2014"} crossed off as approved or excused</div>
                   </div>
                   <div style={{flex:1,minHeight:0,padding:"10px 12px",overflowY:"auto"}}>
-                    {[...required,...others].map((d,i)=>({d:d,i:i})).sort((a,b)=>{const ov=(x)=>x.d.status==="approved"?0:x.d.status==="excused"?1:2;return ov(a)-ov(b)||a.i-b.i;}).map(({d})=>{
+                    {[...required,...others].map((d,i)=>({d:d,i:i})).sort((a,b)=>{const ov=(x)=>x.d.status==="approved"?0:x.d.status==="excused"?1:2;const ts=(x)=>x.d.approvedAt||x.d.excusedAt||0;return ov(a)-ov(b)||ts(b)-ts(a)||a.i-b.i;}).map(({d})=>{
                       const doneA=d.status==="approved";const doneE=d.status==="excused";const done=doneA||doneE;
                       const hint=done?null:(isPendingRuling(d)?{t:"awaiting your ruling",c:"#c0392b"}:isUploadedReview(d)?{t:"in To Review",c:"#b8963e"}:{t:"on the chase list",c:"#c07267"});
                       return(
@@ -1567,7 +1567,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                         <div title={d.note||""} style={{fontSize:11.5,color:"#999",margin:"3px 0 6px",lineHeight:1.4,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{d.reason==="rejected"?<span style={{color:"#a94438"}}>Rejected{d.note?" \u2014 "+d.note:""}</span>:(d.reason&&DOC_REASONS[d.reason]?"Debtor: \u201c"+DOC_REASONS[d.reason]+"\u201d":(d.requestedDate?"Requested "+d.requestedDate:"Never uploaded"))}</div>
                         <div style={{display:"flex",gap:6}}>
                           <button onClick={()=>pickFile(nm=>patchDoc(d.id,{status:"ai_accepted",aiNote:"Passed AI analysis",fileName:nm,date:today,reason:undefined,note:undefined}))} style={btn}>Upload</button>
-                          <button onClick={()=>decide(d.id,{status:"excused",reason:d.reason&&d.reason!=="rejected"?d.reason:"doesnt_apply",excusedDate:today,note:undefined},"home")} style={btn}>Excuse</button>
+                          <button onClick={()=>decide(d.id,{status:"excused",reason:d.reason&&d.reason!=="rejected"?d.reason:"doesnt_apply",excusedDate:today,excusedAt:Date.now(),note:undefined},"home")} style={btn}>Excuse</button>
                         </div>
                         </div>
                         {PdfBtn(d)}
