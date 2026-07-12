@@ -1125,6 +1125,8 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const [addingRequest,setAddingRequest]=useState(false);
   const [requestDocId,setRequestDocId]=useState("");
   const [requestCustom,setRequestCustom]=useState("");
+  const [followUpPreview,setFollowUpPreview]=useState(()=>{const v=window.__openFollowUp;window.__openFollowUp=null;return !!v;});
+  const [followUpSentAt,setFollowUpSentAt]=useState(null);
   const intakePkg=lead.intakePackage||DEMO_INTAKE_PACKAGES[lead.email]||null;
   const printIntakePackage=()=>{if(!intakePkg)return;const w=window.open("","_blank","width=860,height=940");w.document.write(buildIntakePackageHtml(lead,intakePkg));w.document.close();w.focus();setTimeout(()=>{try{w.print();}catch(e){}},350);};
   const [taskNotify,setTaskNotify]=useState(null);
@@ -1219,7 +1221,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const openLeadTask=(task)=>{
     if(task.status==="Completed"||task.status==="Removed")return;
     if(task.batchDigest){setTab("documents");return;}
-    if(task.title==="Approve document follow-up request"){setDocFilter("awaiting");setTab("documents");return;}
+    if(task.title==="Approve document follow-up request"){setDocFilter("awaiting");setFollowUpPreview(true);setTab("documents");return;}
     if(EMAIL_TASKS[task.title]){setLeadTaskModal(task);return;}
   };
   const sendEmail=()=>{if(!emailBody.trim()||!emailSubject.trim())return;const newComm={id:Date.now(),date:new Date().toISOString().split("T")[0],type:"Email",direction:"Outgoing",subject:emailSubject,body:emailBody,to:lead.firstName+" "+lead.lastName,email:lead.email||""};update({communications:[newComm,...lead.communications]});setEmailBody("");setEmailSubject("");setShowEmailCompose(false);};
@@ -1359,16 +1361,20 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             update({docChecklist:[...checklist,item]});
             setAddingRequest(false);setRequestDocId("");setRequestCustom("");
           };
-          const sendFollowUp=()=>{
-            if(!chase.length)return;
-            const listText=chase.map(d=>"• "+dName(d)+(d.reason==="rejected"&&d.note?" — "+d.note:d.reason&&DOC_REASONS[d.reason]?" ("+DOC_REASONS[d.reason]+")":"")).join("\n");
+          const followUpDraft=(()=>{
+            if(!chase.length)return null;
+            const listText=chase.map(d=>"\u2022 "+dName(d)+(d.reason==="rejected"&&d.note?" \u2014 "+d.note:d.reason&&DOC_REASONS[d.reason]?" ("+DOC_REASONS[d.reason]+")":"")).join("\n");
             const isRepeatReq=(lead.communications||[]).some(c=>(c.subject||"")==="A few documents we still need"||(c.subject||"")==="Still looking for a few documents");
-            const comm=isRepeatReq
-              ?{id:Date.now(),date:today,type:"Email",direction:"Outgoing",subject:"Still looking for a few documents",body:"Hi "+lead.firstName+",\n\nJust a quick reminder \u2014 we're still looking for a few additional documents to complete your file:\n\n"+listText+"\n\nYou can upload them through your secure portal.\n\nMcCune Legal",to:lead.firstName+" "+lead.lastName,email:lead.email||""}
-              :{id:Date.now(),date:today,type:"Email",direction:"Outgoing",subject:"A few documents we still need",body:"Hi "+lead.firstName+",\n\nThanks again for submitting your intake. To keep your case moving, we still need the following:\n\n"+listText+"\n\nYou can upload these through your secure portal.\n\nMcCune Legal",to:lead.firstName+" "+lead.lastName,email:lead.email||""};
+            return isRepeatReq
+              ?{tpl:"Document Request \u2014 Reminder",subject:"Still looking for a few documents",body:"Hi "+lead.firstName+",\n\nJust a quick reminder \u2014 we're still looking for a few additional documents to complete your file:\n\n"+listText+"\n\nYou can upload them through your secure portal.\n\nMcCune Legal"}
+              :{tpl:"Document Request \u2014 Initial",subject:"A few documents we still need",body:"Hi "+lead.firstName+",\n\nThanks again for submitting your intake. To keep your case moving, we still need the following:\n\n"+listText+"\n\nYou can upload these through your secure portal.\n\nMcCune Legal"};
+          })();
+          const sendFollowUp=()=>{
+            if(!followUpDraft)return;
+            const comm={id:Date.now(),date:today,type:"Email",direction:"Outgoing",subject:followUpDraft.subject,body:followUpDraft.body,to:lead.firstName+" "+lead.lastName,email:lead.email||""};
             const next=new Date(Date.now()+7*86400000).toISOString().split("T")[0];
             let tasks=(lead.tasks||[]);
-            const openTask=tasks.find(tk=>tk.status!=="Completed"&&tk.title==="Approve document follow-up request");
+            const openTask=tasks.find(tk=>tk.status==="Pending"&&tk.title==="Approve document follow-up request");
             if(openTask){
               tasks=tasks.map(tk=>tk.id===openTask.id?{...tk,status:"Completed",completedDate:today}:tk);
               tasks=[{...openTask,id:Date.now()+5,status:"Pending",due:next,completedDate:undefined},...tasks];
@@ -1379,6 +1385,8 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               tasks,
               timeline:[{id:Date.now()+1,date:today,action:"Document follow-up sent",detail:chase.length+" document"+(chase.length===1?"":"s")+" requested",user:"Matt McCune"},...(lead.timeline||[])]
             });
+            setFollowUpPreview(false);
+            setFollowUpSentAt(today);
           };
           const btn={padding:"4px 10px",fontSize:11,fontWeight:600,borderRadius:5,cursor:"pointer",border:"1px solid #d0d0d0",background:"#fff",color:"#555"};
           return(<div>
@@ -1486,12 +1494,32 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                   <div>
                     <div style={{fontSize:14,fontWeight:700,color:"#434343"}}>Next Follow-Up Email</div>
                     <div style={{fontSize:11.5,color:"#999",marginTop:2,fontStyle:"italic"}}>{chase.length?("Sends the "+chase.length+" item"+(chase.length===1?"":"s")+" above in the AI-drafted follow-up email — nothing is sent until you approve it."):"Nothing left to request — all documents are in or accounted for."}</div>
+                    {(()=>{const lr=(lead.communications||[]).find(c=>(c.subject||"")==="A few documents we still need"||(c.subject||"")==="Still looking for a few documents");return lr?<div style={{fontSize:11,color:"#7a9c80",marginTop:3,fontWeight:600}}>Last follow-up sent {new Date(lr.date+"T12:00:00").toLocaleDateString("en-US",{month:"numeric",day:"numeric",year:"numeric"})} — “{lr.subject}”</div>:null;})()}
                   </div>
                   <div style={{display:"flex",gap:8,flexShrink:0}}>
                     <button onClick={()=>setAddingRequest(!addingRequest)} style={btn}>+ Request a Document</button>
-                    <button onClick={sendFollowUp} disabled={!chase.length} style={{...btn,background:chase.length?"#7a9c80":"#ccc",color:"#fff",border:"none",padding:"6px 14px",fontSize:12,cursor:chase.length?"pointer":"default"}}>Approve &amp; Send Follow-Up{chase.length?" ("+chase.length+")":""}</button>
+                    <button onClick={()=>setFollowUpPreview(p=>!p)} disabled={!chase.length} style={{...btn,background:chase.length?"#7a9c80":"#ccc",color:"#fff",border:"none",padding:"6px 14px",fontSize:12,cursor:chase.length?"pointer":"default"}}>Review &amp; Send Follow-Up{chase.length?" ("+chase.length+")":""}</button>
                   </div>
                 </div>
+                {followUpSentAt&&!followUpPreview&&(
+                  <div style={{padding:"10px 20px",background:"#eef6ef",borderTop:"1px solid #cfe3d2",fontSize:12.5,color:"#3d5c43",fontWeight:600}}>
+                    Follow-up sent and logged to Communications. The completed Task is in the Task history, and the next {"\u201c"}Approve document follow-up request{"\u201d"} Task is due in one week.
+                  </div>
+                )}
+                {followUpPreview&&followUpDraft&&(
+                  <div style={{borderTop:"1px solid #eee",padding:"14px 20px",background:"#FBFAF7"}}>
+                    <div style={{fontSize:10.5,fontWeight:700,color:"#7a9c80",textTransform:"uppercase",letterSpacing:"0.6px",marginBottom:8}}>{followUpDraft.tpl} {"\u2014"} drafted by AI, waiting on you</div>
+                    <div style={{display:"grid",gridTemplateColumns:"64px 1fr",rowGap:4,columnGap:10,fontSize:12.5,marginBottom:10}}>
+                      <span style={{color:"#999",fontWeight:600}}>To</span><span style={{color:"#434343"}}>{lead.firstName} {lead.lastName} {"\u00b7"} {lead.email}</span>
+                      <span style={{color:"#999",fontWeight:600}}>Subject</span><span style={{color:"#434343",fontWeight:600}}>{followUpDraft.subject}</span>
+                    </div>
+                    <div style={{background:"#fff",border:"1px solid #e0e0e0",borderRadius:8,padding:"12px 14px",fontSize:12.5,color:"#555",lineHeight:1.6,whiteSpace:"pre-wrap",marginBottom:12}}>{followUpDraft.body}</div>
+                    <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+                      <button onClick={()=>setFollowUpPreview(false)} style={btn}>Cancel</button>
+                      <button onClick={sendFollowUp} style={{...btn,background:"#7a9c80",color:"#fff",border:"none",padding:"6px 16px",fontSize:12}}>Approve &amp; Send</button>
+                    </div>
+                  </div>
+                )}
                 {addingRequest&&(
                   <div style={{display:"flex",gap:8,alignItems:"center",padding:"12px 20px",background:"#FBFAF7",borderTop:"1px solid #eee"}}>
                     <select value={requestDocId} onChange={ev=>setRequestDocId(ev.target.value)} style={{padding:"8px 10px",fontSize:12,border:"1px solid #d0d0d0",borderRadius:6,background:"#fff",maxWidth:320}}>
@@ -2764,7 +2792,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
   const [taskModal,setTaskModal]=useState(null); /* an email-approval task opened as a draft */
   const openTask=(t)=>{
     if(t.batchDigest){window.__leadTab="documents";setSelectedLead(t.leadId);setPage("lead-detail");return;}
-    if(t.title==="Approve document follow-up request"){window.__leadTab="documents";window.__docFilter="awaiting";setSelectedLead(t.leadId);setPage("lead-detail");return;}
+    if(t.title==="Approve document follow-up request"){window.__leadTab="documents";window.__docFilter="awaiting";window.__openFollowUp=true;setSelectedLead(t.leadId);setPage("lead-detail");return;}
     if(EMAIL_TASKS[t.title]){setTaskModal(t);return;}
     setSelectedLead(t.leadId);setPage("lead-detail");
   };
