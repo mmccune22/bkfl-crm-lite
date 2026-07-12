@@ -1298,6 +1298,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             <DetailRow label="Last name" value={lead.lastName}/>
             <DetailRow label="Email" value={<span style={{userSelect:"all",cursor:"text"}}>{lead.email}</span>}/>
             <DetailRow label="Phone" value={<span style={{userSelect:"all",cursor:"text"}}>{lead.phone}</span>}/>
+            <DetailRow label="Case" value={<span style={{fontWeight:600}}>{(lead.contacts||[]).some(c=>c.role&&c.role.indexOf("Spouse")>=0)?"Joint":"Individual"}<span style={{fontSize:11,color:"#999",marginLeft:8,fontStyle:"italic"}}>set at Lead creation</span></span>}/>
             <DetailRow label="Stage" value={<span><StageBadge stage={lead.leadStage}/>{lead.leadStage==="Ready for Petition Prep"&&lead.prepReadyDate?<span style={{fontSize:11,color:"#00695c",marginLeft:8,fontWeight:700}}>{prepAge(lead)}</span>:<span style={{fontSize:11,color:"#999",marginLeft:8,fontStyle:"italic"}}>set automatically</span>}</span>}/>
             <DetailRow label="Intake sent" value={lead.intakeSentDate?new Date(lead.intakeSentDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}):"—"}/>
             <DetailRow label="Intake submitted" value={lead.intakeSubmittedDate?new Date(lead.intakeSubmittedDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}):"—"}/>
@@ -1473,6 +1474,13 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                       <div key={d.id} id={"chasecard-"+d.id} style={{border:"1px solid #eee",borderRadius:8,padding:"9px 11px",marginBottom:7,background:"#fff"}}>
                         <div style={{fontSize:13,fontWeight:600,color:"#434343",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dName(d)}</div>
                         <div title={d.note||""} style={{fontSize:11.5,color:"#999",margin:"3px 0 6px",lineHeight:1.4,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{d.reason==="rejected"?<span style={{color:"#a94438"}}>Rejected{d.note?" \u2014 "+d.note:""}</span>:(d.reason&&DOC_REASONS[d.reason]?"Debtor: \u201c"+DOC_REASONS[d.reason]+"\u201d":(d.requestedDate?"Requested "+d.requestedDate:"Never uploaded"))}</div>
+                        {d.rejectedFile&&<div onClick={()=>setPreviewDoc(previewDoc===d.id?null:d.id)} style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#3d5c43",fontWeight:600,cursor:"pointer",marginBottom:6}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#c0392b" strokeWidth="1.8"/><path d="M14 2v6h6" stroke="#c0392b" strokeWidth="1.8"/></svg><span style={{textDecoration:"underline"}}>View rejected PDF</span></div>}
+                        {previewDoc===d.id&&d.rejectedFile&&(
+                          <div style={{border:"1px dashed #ccc",borderRadius:6,padding:"10px 8px",textAlign:"center",background:"#fbfbf9",marginBottom:6}}>
+                            <div style={{fontSize:10.5,fontWeight:600,color:"#666"}}>{d.rejectedFile}</div>
+                            <div style={{fontSize:9.5,color:"#aaa",marginTop:2}}>The upload your firm rejected {"\u2014"} kept for reference</div>
+                          </div>
+                        )}
                         <div style={{display:"flex",gap:6}}>
                           <button onClick={()=>pickFile(nm=>patchDoc(d.id,{status:"ai_accepted",aiNote:"Passed AI analysis",fileName:nm,date:today,reason:undefined,note:undefined}))} style={btn}>Upload</button>
                           <button onClick={()=>decide(d.id,{status:"excused",reason:d.reason&&d.reason!=="rejected"?d.reason:"doesnt_apply",excusedDate:today,note:undefined},"right")} style={btn}>Excuse</button>
@@ -1569,10 +1577,19 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                   <div style={{flex:1,minHeight:0,padding:"10px 12px",overflowY:"auto"}}>
                     {buckets.home.length===0&&<div style={{fontSize:11.5,color:"#ccc",textAlign:"center",padding:"18px 6px",lineHeight:1.5}}>Nothing approved yet {"\u2014"} every approval lands here.</div>}
                     {buckets.home.map(d=>(
-                      <div key={d.id} style={{display:"flex",alignItems:"center",gap:7,border:"1px solid #e7efe8",borderRadius:8,padding:"8px 11px",marginBottom:6,background:"#fcfefc"}}>
-                        <span onClick={()=>d.fileName&&setPreviewDoc(previewDoc===d.id?null:d.id)} style={{fontSize:13,fontWeight:600,color:"#434343",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",cursor:d.fileName?"pointer":"default"}}>{dName(d)}</span>
-                        <button onClick={()=>patchDoc(d.id,{status:"ai_accepted",approvedDate:undefined})} style={{marginLeft:"auto",background:"none",border:"none",color:"#bbb",fontSize:10.5,cursor:"pointer",flexShrink:0}} title="Send back to To Review">re-review</button>
+                      <React.Fragment key={d.id}>
+                      <div style={{display:"flex",alignItems:"center",gap:7,border:"1px solid #e7efe8",borderRadius:8,padding:"8px 11px",marginBottom:previewDoc===d.id?4:6,background:"#fcfefc"}}>
+                        <span style={{fontSize:13,fontWeight:600,color:"#434343",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dName(d)}</span>
+                        {d.fileName&&<button onClick={()=>setPreviewDoc(previewDoc===d.id?null:d.id)} title={"View PDF \u2014 "+d.fileName} style={{marginLeft:"auto",background:"none",border:"none",cursor:"pointer",padding:0,display:"flex",flexShrink:0}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#c0392b" strokeWidth="1.8"/><path d="M14 2v6h6" stroke="#c0392b" strokeWidth="1.8"/></svg></button>}
+                        <button onClick={()=>patchDoc(d.id,{status:"ai_accepted",approvedDate:undefined})} style={{marginLeft:d.fileName?0:"auto",background:"none",border:"none",color:"#bbb",fontSize:10.5,cursor:"pointer",flexShrink:0}} title="Send back to To Review">re-review</button>
                       </div>
+                      {previewDoc===d.id&&d.fileName&&(
+                        <div style={{border:"1px dashed #ccc",borderRadius:6,padding:"10px 8px",textAlign:"center",background:"#fbfbf9",marginBottom:6}}>
+                          <div style={{fontSize:10.5,fontWeight:600,color:"#666"}}>{d.fileName}</div>
+                          <div style={{fontSize:9.5,color:"#aaa",marginTop:2}}>Inline preview {"\u2014"} full PDF in production</div>
+                        </div>
+                      )}
+                      </React.Fragment>
                     ))}
                     {buckets.excused.length>0&&<React.Fragment>
                       <div style={{fontSize:10.5,fontWeight:700,color:"#aaa",textTransform:"uppercase",letterSpacing:"0.5px",margin:"10px 2px 6px"}}>Excused {"\u2014"} not applicable</div>
