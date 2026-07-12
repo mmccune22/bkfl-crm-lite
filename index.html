@@ -1298,7 +1298,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             <DetailRow label="Last name" value={lead.lastName}/>
             <DetailRow label="Email" value={<span style={{userSelect:"all",cursor:"text"}}>{lead.email}</span>}/>
             <DetailRow label="Phone" value={<span style={{userSelect:"all",cursor:"text"}}>{lead.phone}</span>}/>
-            <DetailRow label="Case" value={<span style={{fontWeight:600}}>{(lead.contacts||[]).some(c=>c.role&&c.role.indexOf("Spouse")>=0)?"Joint":"Individual"}<span style={{fontSize:11,color:"#999",marginLeft:8,fontStyle:"italic"}}>set at Lead creation</span></span>}/>
+            <DetailRow label="Filing" value={<span style={{fontWeight:600}}>{(lead.contacts||[]).some(c=>c.role&&c.role.indexOf("Spouse")>=0)?"Joint":"Individual"}</span>}/>
             <DetailRow label="Stage" value={<span><StageBadge stage={lead.leadStage}/>{lead.leadStage==="Ready for Petition Prep"&&lead.prepReadyDate?<span style={{fontSize:11,color:"#00695c",marginLeft:8,fontWeight:700}}>{prepAge(lead)}</span>:<span style={{fontSize:11,color:"#999",marginLeft:8,fontStyle:"italic"}}>set automatically</span>}</span>}/>
             <DetailRow label="Intake sent" value={lead.intakeSentDate?new Date(lead.intakeSentDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}):"—"}/>
             <DetailRow label="Intake submitted" value={lead.intakeSubmittedDate?new Date(lead.intakeSubmittedDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}):"—"}/>
