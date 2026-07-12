@@ -1254,6 +1254,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
           <h1 style={{fontSize:22,fontWeight:700,color:"#434343",margin:0}}>{lead.firstName} {lead.lastName}</h1>
           <StageBadge stage={lead.leadStage}/>
           {lead.leadStage==="Ready for Petition Prep"&&lead.prepReadyDate&&<span style={{fontSize:12.5,color:"#00695c",fontWeight:700}}>{prepAge(lead)}</span>}
+          {lead.dashHidden&&<button onClick={()=>update({dashHidden:false})} title="This Lead is hidden from the Dashboard. Click to show it there again." style={{fontSize:11,fontWeight:600,color:"#888",background:"#f5f5f5",border:"1px solid #ddd",borderRadius:5,padding:"3px 10px",cursor:"pointer"}}>Hidden from Dashboard {"\u2014"} click to restore</button>}
         </div>
         <div style={{display:"flex",gap:8,marginBottom:16,paddingLeft:32}}>
           {lead.leadStage==="Intake Sent"&&<button onClick={()=>{
@@ -2873,11 +2874,11 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
       )}
 
       {/* Intake pipeline (moved from Leads page) */}
-      <div style={{display:"flex",gap:12,marginBottom:18}}>
+      <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:18}}>
         {["New Lead","Intake Sent"].map(stage=>{
           const sc=leadStageColors[stage]||{bg:"#f5f5f5",border:"#999",text:"#555"};
           const dateField=stage==="New Lead"?"createdDate":"intakeSentDate";
-          const stageLeads=_.orderBy(leads.filter(l=>l.leadStage===stage),dateField,"desc");
+          const stageLeads=_.orderBy(leads.filter(l=>l.leadStage===stage&&!l.dashHidden),dateField,"desc");
           return(
             <div key={stage} style={{flex:1,background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden"}}>
               <div onClick={()=>setPage("leads")} style={{background:sc.bg,padding:"12px 16px",borderBottom:"2px solid "+sc.border,display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}}>
@@ -2894,6 +2895,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}>
                       <span style={{fontSize:13,fontWeight:600,color:"#434343",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{l.firstName} {l.lastName}</span>
                       <span style={{fontSize:11.5,color:"#666",whiteSpace:"nowrap"}}>{l[dateField]?new Date(l[dateField]+"T12:00:00").toLocaleDateString("en-US",{month:"numeric",day:"numeric",year:"numeric"}):"—"}</span>
+                      <button title="Remove from Dashboard — the Lead stays in the CRM under Leads" onClick={e=>{e.stopPropagation();setLeads(prev=>prev.map(x=>x.id===l.id?{...x,dashHidden:true}:x));}} style={{border:"none",background:"transparent",color:"#bbb",fontSize:16,cursor:"pointer",padding:"0 2px",lineHeight:1,flexShrink:0}} onMouseEnter={e=>e.currentTarget.style.color="#c0392b"} onMouseLeave={e=>e.currentTarget.style.color="#bbb"}>{"\u00d7"}</button>
                     </div>
                   </div>
                 ))}
@@ -2906,7 +2908,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
 
       {/* ── Intake Inbox — submitted packages ready for review ── */}
       {(()=>{
-        const submitted=_.orderBy(leads.filter(l=>l.leadStage==="Intake Submitted"),"intakeSubmittedDate","desc");
+        const submitted=_.orderBy(leads.filter(l=>l.leadStage==="Intake Submitted"&&!l.dashHidden),"intakeSubmittedDate","desc");
         if(!submitted.length)return null;
         return(
         <div style={{background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden",marginBottom:18}}>
@@ -2937,6 +2939,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
               <div style={{width:120,fontSize:12.5,fontWeight:600,color:"#434343"}}>{l.intakeSubmittedDate?new Date(l.intakeSubmittedDate+"T12:00:00").toLocaleDateString("en-US",{month:"numeric",day:"numeric",year:"numeric"}):"—"}</div>
               <div style={{width:110,fontSize:12.5,color:"#434343"}}>{cl.length?docsIn+" of "+cl.length:"—"}</div>
               <div style={{width:110}}>{flags>0?<span style={{fontSize:12,fontWeight:700,color:"#c0392b"}}>{flags}</span>:<span style={{fontSize:12,color:"#999"}}>0</span>}</div>
+              <button title="Remove from Dashboard — the Lead stays in the CRM under Leads" onClick={e=>{e.stopPropagation();setLeads(prev=>prev.map(x=>x.id===l.id?{...x,dashHidden:true}:x));}} style={{border:"none",background:"transparent",color:"#bbb",fontSize:16,cursor:"pointer",padding:"0 2px",lineHeight:1,flexShrink:0}} onMouseEnter={e=>e.currentTarget.style.color="#c0392b"} onMouseLeave={e=>e.currentTarget.style.color="#bbb"}>{"\u00d7"}</button>
               <div style={{width:44,display:"flex",justifyContent:"flex-end"}}>
                 <div style={{width:30,height:30,borderRadius:6,border:"1px solid #d0d0d0",display:"flex",alignItems:"center",justifyContent:"center"}}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#434343" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -2949,7 +2952,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
 
       {/* ── Stage 4 — Ready for Petition Prep (the finish line) ── */}
       {(()=>{
-        const ready=_.orderBy(leads.filter(l=>l.leadStage==="Ready for Petition Prep"),"prepReadyDate","desc");
+        const ready=_.orderBy(leads.filter(l=>l.leadStage==="Ready for Petition Prep"&&!l.dashHidden),"prepReadyDate","desc");
         if(!ready.length)return null;
         const sc=leadStageColors["Ready for Petition Prep"];
         return(
@@ -2967,6 +2970,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
                 <span style={{fontSize:12,color:"#888"}}>{l.bankruptcyType}</span>
                 <span style={{fontSize:12,color:"#888"}}>Ready since {l.prepReadyDate?new Date(l.prepReadyDate+"T12:00:00").toLocaleDateString("en-US",{month:"numeric",day:"numeric",year:"numeric"}):"—"}</span>
                 <span style={{background:sc.bg,color:sc.text,border:"1px solid "+sc.border,borderRadius:5,padding:"3px 12px",fontSize:12,fontWeight:700,whiteSpace:"nowrap"}}>{prepAge(l)}</span>
+                <button title="Remove from Dashboard — the Lead stays in the CRM under Leads" onClick={e=>{e.stopPropagation();setLeads(prev=>prev.map(x=>x.id===l.id?{...x,dashHidden:true}:x));}} style={{border:"none",background:"transparent",color:"#bbb",fontSize:16,cursor:"pointer",padding:"0 2px",lineHeight:1,flexShrink:0}} onMouseEnter={e=>e.currentTarget.style.color="#c0392b"} onMouseLeave={e=>e.currentTarget.style.color="#bbb"}>{"\u00d7"}</button>
               </div>
             ))}
           </div>
@@ -2996,7 +3000,7 @@ function DashboardPage({leads,setLeads,setPage,setSelectedLead}){
             <div style={{width:78,flexShrink:0,fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:0.5,textAlign:"right"}}>Due</div>
             <div style={{width:56,flexShrink:0,fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:0.5,textAlign:"right"}}>Remove</div>
           </div>
-          <div style={{maxHeight:520,overflowY:"auto"}}>
+          <div style={{maxHeight:196,overflowY:"auto"}}>
             {tasks.length===0?<div style={{padding:16,textAlign:"center",color:"#999",fontSize:12}}>All tasks completed.</div>:
             tasks.map((t,i)=>(
               <div key={i} onClick={()=>openTask(t)} style={{display:"flex",gap:10,padding:"8px 14px",borderBottom:"1px solid #f5f5f5",cursor:"pointer",alignItems:"center"}} onMouseEnter={e=>e.currentTarget.style.background="#f2f3ef"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
