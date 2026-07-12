@@ -1496,6 +1496,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                       <div style={{display:"flex",gap:12,alignItems:"center"}}>
                         <span style={{fontSize:13,fontWeight:700,color:"#434343",flexShrink:0,maxWidth:250,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dName(d)}{d.manual&&<span style={{fontSize:9.5,color:"#999",fontWeight:400}}> (staff)</span>}</span>
                         <span title={stx.t} style={{flex:1,minWidth:0,fontSize:11.5,fontWeight:600,color:stx.c,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{stx.t}</span>
+                        {PdfBtn(d)}
                         <div style={{display:"flex",gap:6,flexShrink:0}}>
                           {(d.status==="ai_accepted"||d.status==="ai_flagged")&&<React.Fragment>
                             <button onClick={()=>decide(d.id,{status:"approved",approvedDate:today},"home")} style={{...btn,background:"#7a9c80",color:"#fff",border:"none",padding:"5px 13px",fontSize:11.5}}>{d.status==="ai_flagged"?"Approve Anyway":"Approve"}</button>
@@ -1508,7 +1509,6 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                             <button onClick={()=>pickFile(nm=>patchDoc(d.id,{status:"ai_accepted",aiNote:"Passed AI analysis",fileName:nm,date:today,reason:undefined}))} style={{...btn,padding:"5px 10px",fontSize:11.5}}>Upload</button>
                           </React.Fragment>}
                         </div>
-                        {PdfBtn(d)}
                       </div>
                       {rejectingDoc===d.id&&(
                         <div style={{display:"flex",gap:6,alignItems:"center",marginTop:8}}>
