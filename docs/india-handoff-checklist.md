@@ -47,6 +47,7 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
 - ✅ "Excused" is its own status and requires a firm ruling — a debtor's "doesn't apply" waits for the firm; only Approve or Excuse closes an item. Ready for Petition Prep = every requested Document Approved or Excused
 - ✅ Review completion = every uploaded Document ruled AND every skipped Document ruled (Excuse/Keep Chasing). Both review Task types stay (initial intake / follow-up uploads); SIX task types total
 - ✅ Chase Task is event-driven, both directions: born the moment review completes with a non-empty chase list (due immediately — the old 1-week timer is dead), re-arms weekly while the chase holds, and auto-completes the instant the chase list empties. Triggers hang on checklist STATE, never on Task completion, so the On/Off switches can't break the chain
+- ✅ One Documents tab per Lead, no separate intake-documents section — at the Lead stage every document IS an intake requirement (this version ends at Ready for Petition Prep). Multi-section document management is a Matter concept (post-conversion, v2); the intake checklist becomes the Intake folder of that structure when conversion exists
 - ✅ Chase is ONE Task with TWO templates — "Document Request — Initial" first send, "Document Request — Reminder" on repeats (first-vs-repeat is a parameter per rule 7)
 - 🔶 5:00 a.m. single batch window — stated in-app; put the one-clock rule in the spec explicitly
 - ✅ Communications come from the firm, not an individual; no custom template builder in v1
