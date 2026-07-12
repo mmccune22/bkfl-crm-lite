@@ -65,6 +65,12 @@ Status key: ✅ have it · 🔶 exists, needs extraction or updating before hand
 - ✅ Design principle: every AI-driven feature ships with a firm-level Off switch — some lawyers will want any given AI step turned off, and that must always be possible without removing the feature for everyone. The per-Task switches are the v1 implementation; apply the same principle to every future AI feature
 - ✅ AI disclaimer: the AI Intake Summary carries a preliminary-review disclaimer in BOTH the email body and the attached PDF (the PDF travels alone) — AI-assisted, preliminary only, not legal advice, attorney will personally review, figures may change
 
+## 4b. Portal UX backlog (post-beta, deliberately not built yet)
+- ⬜ Keyboard review: A approve / R reject / E excuse with focus moving down the To Review list — turns a 20-doc review into 20 keystrokes
+- ⬜ Reject-reason presets: the 3-4 most common rejections (missing months, illegible, wrong document) as one-click chips above the free-text note
+- ⬜ Responsive pass: the bottom two-column grid needs a stacked layout under ~900px (the portal is desktop-first by design for v1)
+- ⬜ Batch approve for AI-accepted documents (approve-all-clean) — deliberately EXCLUDED from v1: one click per document is the review-first promise; revisit only with real usage data
+
 ## 5. Enterprise / Non-Functional (mostly undiscussed — decide before handoff)
 - ⬜ Security & compliance: encryption at rest/in transit, privilege considerations, data retention/deletion policy, audit logging
 - ✅ Multi-tenancy: DECIDED — the existing v1 platform is multi-tenant and that model carries forward; this project changes the windows (intake + CRM), adds document upload, and new rules on top of it
