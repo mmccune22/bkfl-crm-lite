@@ -2653,34 +2653,72 @@ function SettingsPage(){
 
       {settingsTab==="docs"&&(
         <div style={{maxWidth:900}}>
-          <div style={{fontSize:13,color:"#666",marginBottom:16,lineHeight:1.65}}>
-            <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>The master document rulebook</div>
-            {["Set by the AI intake. Fixed in this version — shown here for reference.",
-              "Tiers govern what the debtor must do before submitting. Your review is the same for every Document: Approve, Reject, or Excuse.",
-              "Every case uses the first list (All Cases — Every Filing).",
-              "Married, filing jointly: all 7 spouse Documents are added.",
-              "Married, filing individually: only the 3 spouse income Documents are added — the spouse isn't a filer, but their income counts for the means test."
-            ].map((r,i)=>(
-              <div key={i} style={{display:"flex",gap:10,marginBottom:4}}>
-                <span style={{fontWeight:700,color:"#7a9c80",flexShrink:0,width:16,textAlign:"right"}}>{i+1}.</span>
-                <span>{r}</span>
-              </div>
-            ))}
+
+          <div style={{background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden",marginBottom:16}}>
+            <div style={{background:"#e7eae5",padding:"12px 20px",borderBottom:"2px solid #7a9c80"}}>
+              <span style={{fontSize:13,fontWeight:700,color:"#3d5c43",textTransform:"uppercase",letterSpacing:"0.5px"}}>The Master Document Rulebook</span>
+            </div>
+            <div style={{padding:"16px 20px",fontSize:13,color:"#555",lineHeight:1.65}}>
+              {(()=>{let n=0;return [
+                {h:"Where the checklist comes from",rules:[
+                  "Set by the AI intake. Fixed in this version \u2014 shown here for reference.",
+                  "A Document is only requested when the debtor\u2019s intake answers call for it \u2014 no property, no property Documents.",
+                  "Every case uses the first list (All Cases \u2014 Every Filing).",
+                  "Married, filing jointly: all 7 spouse Documents are added.",
+                  "Married, filing individually: only the 3 spouse income Documents are added \u2014 the spouse isn\u2019t a filer, but their income counts for the means test.",
+                  "The Intake Rule badge on each Document (Required to Submit / Upload or Reason / Optional) governs the debtor\u2019s submission only. Your review is the same for every Document."
+                ]},
+                {h:"How a Document moves",rules:[
+                  "On submission, the checklist is built from the intake answers. Uploads go straight to AI analysis; everything not uploaded starts on the chase list.",
+                  "The AI screens every upload and either accepts it or flags a problem. AI acceptance is a recommendation \u2014 never an approval.",
+                  "Your firm reviews every Document on the Lead\u2019s Documents tab: Approve or Excuse closes it to Home Base; Reject sends it to the chase list with your note attached.",
+                  "A case is Document-complete when everything is Approved or Excused \u2014 the Lead moves to Ready for Petition Prep automatically, and moves back if anything reopens."
+                ]},
+                {h:"How and when we follow up",rules:[
+                  "The chase list is built by your review \u2014 rejected Documents and Keep Chasing rulings \u2014 plus anything never uploaded.",
+                  "The moment the initial review is finished with anything left to chase, the \u201cApprove document follow-up request\u201d Task is created. Nothing runs on a blind timer.",
+                  "The AI drafts the request email \u2014 \u201cDocument Request \u2014 Initial\u201d the first time, \u201cReminder\u201d on repeats \u2014 and nothing is sent without firm approval.",
+                  "Follow-ups repeat weekly while the chase list is not empty; the Task completes itself the moment the list clears.",
+                  "Every follow-up email carries the debtor\u2019s secure upload link. Each upload lands in its own requested item, is AI-screened, and reaches your review through the daily 5:00 a.m. batch."
+                ]},
+                {h:"What the debtor\u2019s reasons do",rules:[
+                  "\u201c"+DOC_REASONS.will_send_later+"\u201d and \u201c"+DOC_REASONS.not_taken_yet+"\u201d keep the item on the chase list automatically.",
+                  "\u201c"+DOC_REASONS.doesnt_apply+"\u201d, \u201c"+DOC_REASONS.didnt_file+"\u201d, and \u201c"+DOC_REASONS.dont_have_copy+"\u201d wait for your ruling: Excuse closes the item; Keep Chasing puts it on the follow-up list.",
+                  "One per asset: valuation reports, mortgage statements, and vehicle titles generate one checklist item per property or vehicle."
+                ]}
+              ].map(sec=>(
+                <div key={sec.h} style={{marginBottom:14}}>
+                  <div style={{fontSize:11.5,fontWeight:700,color:"#3d5c43",textTransform:"uppercase",letterSpacing:"0.5px",marginBottom:6}}>{sec.h}</div>
+                  {sec.rules.map(r=>{n+=1;return(
+                    <div key={n} style={{display:"flex",gap:10,marginBottom:4}}>
+                      <span style={{fontWeight:700,color:"#7a9c80",flexShrink:0,width:20,textAlign:"right"}}>{n}.</span>
+                      <span>{r}</span>
+                    </div>);})}
+                </div>
+              ));})()}
+            </div>
           </div>
-          <div style={{display:"flex",gap:16,flexWrap:"wrap",marginBottom:16,fontSize:12,color:"#666"}}>
+
+          <div style={{display:"flex",gap:16,flexWrap:"wrap",marginBottom:16,fontSize:12,color:"#666",alignItems:"center"}}>
+            <span style={{fontWeight:700,color:"#434343"}}>Intake Rule key:</span>
             <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fde8e8",color:"#c0392b",border:"1px solid #f5b7b1",marginRight:6}}>Required to Submit</span>The intake will not let the debtor submit without it.</span>
-            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fef3cd",color:"#856404",border:"1px solid #ffc107",marginRight:6}}>Upload or Reason</span>The debtor uploads it or gives a reason — never blocks submission; reasons come to you for a ruling.</span>
+            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fef3cd",color:"#856404",border:"1px solid #ffc107",marginRight:6}}>Upload or Reason</span>Upload it or give a reason — reasons come to you for a ruling.</span>
             <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#f0f0ed",color:"#888",border:"1px solid #ccc",marginRight:6}}>Optional</span>Helpful if they have it — never chased, never counted.</span>
           </div>
+
           {[
             {title:"All Cases (every filing)",ids:DOC_TYPES.filter(d=>d.group==="all").map(d=>d.id)},
-            {title:"Married — Filing Jointly (adds all 7 spouse documents)",ids:["sp_id_license","sp_ssn_proof","sp_tax_return_y1","sp_tax_return_y2","sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
-            {title:"Married — Filing Individually (adds only these 3 — also in the joint list)",ids:["sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
+            {title:"Married \u2014 Filing Jointly (adds all 7 spouse documents)",ids:["sp_id_license","sp_ssn_proof","sp_tax_return_y1","sp_tax_return_y2","sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
+            {title:"Married \u2014 Filing Individually (adds only these 3 \u2014 also in the joint list)",ids:["sp_pay_stubs","sp_other_income_proof","sp_bank_statements"]},
           ].map(sec=>(
             <div key={sec.title} style={{background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden",marginBottom:16}}>
               <div style={{background:"#e7eae5",padding:"12px 20px",borderBottom:"2px solid #7a9c80",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <span style={{fontSize:13,fontWeight:700,color:"#3d5c43",textTransform:"uppercase",letterSpacing:"0.5px"}}>{sec.title}</span>
                 <span style={{background:"#7a9c80",color:"#fff",borderRadius:12,padding:"2px 8px",fontSize:11,fontWeight:700}}>{sec.ids.length}</span>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",padding:"6px 20px",borderBottom:"1px solid #f0f0ed",background:"#FBFAF7"}}>
+                <span style={{fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:"0.5px"}}>Document</span>
+                <span style={{fontSize:10,fontWeight:700,color:"#999",textTransform:"uppercase",letterSpacing:"0.5px"}}>Intake Rule</span>
               </div>
               <div>
                 {sec.ids.map(id=>DOC_TYPES.find(x=>x.id===id)).map(d=>{
@@ -2689,7 +2727,7 @@ function SettingsPage(){
                   <div key={d.id} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"10px 20px",borderBottom:"1px solid #f5f5f5"}}>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontSize:13,fontWeight:600,color:"#434343"}}>{d.name}{d.multi&&<span style={{fontSize:10,color:"#999",fontWeight:400,marginLeft:6}}>(one per item)</span>}</div>
-                      <div style={{fontSize:11,color:"#999",marginTop:1}}>Requested when: {d.when}{d.note?" — "+d.note:""}</div>
+                      <div style={{fontSize:11,color:"#999",marginTop:1}}>Requested when: {d.when}{d.note?" \u2014 "+d.note:""}</div>
                     </div>
                     <span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:rb.bg,color:rb.text,border:"1px solid "+rb.border,flexShrink:0,marginTop:2}}>{rb.label}</span>
                   </div>);
@@ -2697,46 +2735,6 @@ function SettingsPage(){
               </div>
             </div>
           ))}
-          <div style={{background:"#fff",borderRadius:10,border:"1px solid #e0e0e0",overflow:"hidden"}}>
-            <div style={{padding:"12px 20px",borderBottom:"1px solid #eee",fontSize:13,fontWeight:700,color:"#434343"}}>Follow-Up Rules</div>
-            <div style={{padding:"14px 20px",fontSize:13,color:"#555",lineHeight:1.7}}>
-              <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>How a document moves</div>
-              <div style={{marginBottom:14}}>
-                {[
-                  ["Intake Submitted","the debtor's checklist is built from their intake answers. Documents uploaded with the intake go straight to AI analysis, and the AI recommends each one for final acceptance or rejection by the law firm. Anything not uploaded starts as Awaiting Upload."],
-                  ["AI Analysis","every upload is analyzed automatically and either accepted or flagged."],
-                  ["Firm Approval","a member of your firm approves or rejects it. AI acceptance is a recommendation — no document is final until your firm approves it. Rejected documents return to Awaiting Upload and join the next follow-up email."],
-                ].map((st,i)=>(
-                  <div key={i} style={{display:"flex",gap:10,marginBottom:6}}>
-                    <div style={{width:20,height:20,borderRadius:"50%",background:"#e7eae5",color:"#3d5c43",fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:2}}>{i+1}</div>
-                    <div><strong style={{color:"#434343"}}>{st[0]}</strong> — {st[1]}</div>
-                  </div>
-                ))}
-              </div>
-              <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>Document categories</div>
-              <div style={{marginBottom:14}}>
-                {[
-                  ["#7a9c80","Approved by Firm","home base. Uploaded, accepted by the AI analysis, and manually approved by your firm. A case is document-complete when everything applicable is here."],
-                  ["#F59E0B","Accepted by AI","uploaded and passed the AI analysis. Waiting on your firm's approval."],
-                  ["#dc3545","AI Flagged","uploaded, but the AI found a problem (wrong document, missing pages, illegible). Your firm reviews it — approve anyway, or reject to re-request."],
-                  ["#dc3545","Rejected","reviewed and rejected by your firm, with the reason attached. Re-requested from the debtor in the next follow-up email and moved to Awaiting Upload."],
-                  ["#999999","Not Applicable","the debtor gave a reason instead of uploading. Judgment-call reasons are flagged for law firm review."],
-                  ["#F59E0B","Awaiting Upload","not yet received — never uploaded or promised for later. Awaiting Upload and Rejected together make up the follow-up email request list."],
-                ].map((c,i)=>(
-                  <div key={i} style={{display:"flex",gap:10,marginBottom:6}}>
-                    <div style={{width:10,height:10,borderRadius:"50%",background:c[0],flexShrink:0,marginTop:6}}/>
-                    <div><strong style={{color:"#434343"}}>{c[1]}</strong> — {c[2]}</div>
-                  </div>
-                ))}
-              </div>
-              <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>How and when we follow up</div>
-              <p style={{margin:"0 0 14px"}}>Once a week, the AI drafts a single follow-up email listing everything still awaiting upload — including anything your firm rejected, with the rejection reason written in. It is never sent automatically: it arrives as the task “Approve document follow-up request” and goes out only after someone at your firm approves it. Follow-ups repeat weekly until every item is received or accounted for.</p>
-              <div style={{fontWeight:700,color:"#434343",marginBottom:6}}>What the debtor's reasons do</div>
-              <p style={{margin:"0 0 6px"}}><strong>Keep chasing:</strong> “{DOC_REASONS.will_send_later}” and “{DOC_REASONS.not_taken_yet}” — the item stays on the follow-up list.</p>
-              <p style={{margin:"0 0 14px"}}><strong>Stop chasing, flag for law firm review:</strong> “{DOC_REASONS.doesnt_apply}”, “{DOC_REASONS.didnt_file}”, and “{DOC_REASONS.dont_have_copy}” (softer chase).</p>
-              <p style={{margin:0}}><strong>One per asset:</strong> valuation reports, mortgage statements, and vehicle titles generate one checklist item per property or vehicle.</p>
-            </div>
-          </div>
         </div>
       )}
 
