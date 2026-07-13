@@ -1198,7 +1198,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
       const _chaseN=_cl.filter(isChaseDoc).length;
       let _tks=m.tasks||[];
       if(_chaseN===0){
-        _tks=_tks.map(tk=>tk.status==="Pending"&&tk.title==="Approve document follow-up request"?{...tk,status:"Completed",completedDate:_today,completedBy:"System — chase list cleared"}:tk);
+        _tks=_tks.map(tk=>tk.status==="Pending"&&tk.title==="Approve document follow-up request"?{...tk,status:"Completed",completedDate:_today,completedBy:"System — Chase List cleared"}:tk);
       }else if(docReviewDone(_cl)&&taskEnabled("Approve document follow-up request")&&!_tks.some(tk=>tk.status==="Pending"&&tk.title==="Approve document follow-up request")){
         _tks=[{id:Date.now()+7,title:"Approve document follow-up request",due:_today,status:"Pending",assignee:"Matt McCune",stage:"Intake Submitted",recurring:true},..._tks];
       }
@@ -1346,7 +1346,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             home:"Home Base. Every Document a case needs ends up here \u2014 uploaded, screened by the AI analysis, and approved by your firm with one click. Nothing starts here, and nothing counts as done until it is here.",
             required:"Pile 1 \u2014 Required Documents the debtor had to upload to submit the intake, each pre-screened by the AI. Review these first: Approve moves a Document to Home Base; Reject sends it back to the debtor as an automatic re-request.",
             requested:"Pile 2 \u2014 Documents requested from the debtor\u2019s intake answers (or optional ones) that they did upload. Same review as Pile 1: Approve to Home Base, Reject to re-request.",
-            missing:"Pile 3 \u2014 requested but never uploaded. Where the debtor gave a reason, make your ruling: Excuse closes the item as not applicable, Keep Chasing puts it on the follow-up list. Everything on the chase list rides the next follow-up email below.",
+            missing:"Pile 3 \u2014 requested but never uploaded. Where the debtor gave a reason, make your ruling: Excuse closes the item as not applicable, Keep Chasing puts it on the Chase List. Everything on the Chase List rides the next follow-up email below.",
             excused:"Documents your firm excused after reviewing the debtor\u2019s reason \u2014 closed as not applicable to this case. Only a firm ruling lands a Document here.",
             total:"Every Document on this case, in every state. Document types this intake never requested don\u2019t appear at all.",
           };
@@ -1476,7 +1476,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
               <div style={{borderBottom:"1px solid #eee"}}>
                 <div style={{height:64,boxSizing:"border-box",padding:"0 18px",display:"flex",flexDirection:"column",justifyContent:"center",borderBottom:"1px solid #f0f0ed",background:"#fdf6e7"}}>
                   <div style={{fontSize:13,fontWeight:700,color:"#856404",textTransform:"uppercase",letterSpacing:"0.5px"}}>To Review <span style={{background:"#F59E0B",color:"#fff",borderRadius:10,padding:"0px 8px",fontSize:11,marginLeft:4}}>{queue.length}</span> <span style={{marginLeft:6,background:"#7a9c80",color:"#fff",borderRadius:4,padding:"1px 8px",fontSize:10,fontWeight:700,letterSpacing:"0.5px"}}>START HERE</span></div>
-                  <div style={{fontSize:11.5,color:"#b8963e",marginTop:2}}>Work down the list: Approve or Excuse moves it to Home Base and closes the category; Rejected or missing moves to the chase list for the follow-up email.</div>
+                  <div style={{fontSize:11.5,color:"#b8963e",marginTop:2}}>Work down the list: Approve or Excuse moves it to Home Base and closes the category; Rejected or missing moves to the Chase List for the follow-up email.</div>
                 </div>
                 <div style={{maxHeight:212,overflowY:"auto",padding:"12px 18px"}}>
                   {queue.length===0&&(
@@ -1485,7 +1485,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                       <div style={{fontSize:14,fontWeight:700,color:"#434343",marginTop:6}}>Review complete</div>
                       <div style={{fontSize:12,color:"#777",marginTop:5,lineHeight:1.6}}>
                         {chase.length>0
-                          ?<span>The chase list has {chase.length} item{chase.length===1?"":"s"} {"\u2014"} the {"\u201c"}Approve document follow-up request{"\u201d"} Task is open, and the draft is ready below: Review &amp; Send, bottom right.</span>
+                          ?<span>The Chase List has {chase.length} item{chase.length===1?"":"s"} {"\u2014"} the {"\u201c"}Approve document follow-up request{"\u201d"} Task is open, and the draft is ready below: Review &amp; Send, bottom right.</span>
                           :<span>Nothing left to chase {"\u2014"} every Document is Approved or Excused{lead.leadStage==="Ready for Petition Prep"?<span>, and this Lead is <strong>Ready for Petition Prep</strong></span>:null}.</span>}
                       </div>
                     </div>
@@ -1531,7 +1531,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
                   <div style={{flex:1,minHeight:0,padding:"10px 12px",overflowY:"auto"}}>
                     {[...required,...others].map((d,i)=>({d:d,i:i})).sort((a,b)=>{const ov=(x)=>x.d.status==="approved"?0:x.d.status==="excused"?1:2;const ts=(x)=>x.d.approvedAt||x.d.excusedAt||0;return ov(a)-ov(b)||ts(b)-ts(a)||a.i-b.i;}).map(({d})=>{
                       const doneA=d.status==="approved";const doneE=d.status==="excused";const done=doneA||doneE;
-                      const hint=done?null:(isPendingRuling(d)?{t:"awaiting your ruling",c:"#c0392b"}:isUploadedReview(d)?{t:"in To Review",c:"#b8963e"}:{t:"on the chase list",c:"#c07267"});
+                      const hint=done?null:(isPendingRuling(d)?{t:"awaiting your ruling",c:"#c0392b"}:isUploadedReview(d)?{t:"in To Review",c:"#b8963e"}:{t:"on the Chase List",c:"#c07267"});
                       return(
                       <div key={d.id} style={{border:"1px solid "+(doneA?"#cfe3d2":"#eee"),borderRadius:8,padding:"8px 12px",marginBottom:6,background:done?"#fcfefc":"#fafaf8"}}>
                         <div style={{display:"flex",gap:10,alignItems:"center"}}>
@@ -2586,7 +2586,7 @@ function SettingsPage(){
             {title:"Review & approve AI Intake Summary email",stage:"Intake Submitted",created:"Immediately when the intake is submitted",repeats:"Never — a one-time task",desc:"On submission, the AI analyzes everything the debtor submitted and produces the AI Intake Summary — the same summary shown on the Lead’s AI tab. The law firm reviews it and approves the email before the debtor receives it. Nothing is sent without this approval."},
             {title:"Review Documents — initial intake submission",stage:"Intake Submitted",created:"Immediately when the intake is submitted — every Document that came in with the intake is AI-analyzed and waiting for firm review",repeats:"Never — one Task covers the whole initial pile. It completes automatically when the review pile is cleared",desc:"The big review. The debtor's full Document set arrives with the intake, so staff should expect a longer workflow. The Task deep-links into the Lead's Documents tab, where each Document is approved, flagged, or rejected. The Task completes itself when every uploaded Document is ruled on and every skipped Document has a firm ruling — Excuse or Keep Chasing."},
             {title:"Review Documents — follow-up uploads",stage:"Daily 5:00 AM Batch",batch:true,created:"By the daily 5:00 a.m. batch, for Documents uploaded after submission — the handful that arrive from follow-up requests",repeats:"At most one open Task per Lead — the batch refreshes the Document count on an existing open Task instead of stacking a new one",desc:"The small review. After follow-up requests go out, debtors upload a few Documents at a time; those are digested overnight rather than firing a Task per file. Same doorway as the initial review — the Lead's Documents tab — but staff should expect only a handful of Documents. The Dashboard's Intake Inbox still shows live counts between batches."},
-            {title:"Approve document follow-up request",stage:"Intake Submitted",created:"The moment the initial Document review is finished, if anything is left to chase — never on a blind timer. The chase list is built by your review: rejected Documents and Keep Chasing rulings",repeats:"Weekly, while the chase list is not empty. It stops re-arming — and any open copy auto-completes — the moment the chase list clears",desc:"Opening the Task shows the AI-drafted request email — the “Document Request — Initial” template the first time, “Document Request — Reminder” on every repeat — and the law firm approves it before it is sent to the debtor."},
+            {title:"Approve document follow-up request",stage:"Intake Submitted",created:"The moment the initial Document review is finished, if anything is left to chase — never on a blind timer. The chase list is built by your review: rejected Documents and Keep Chasing rulings",repeats:"Weekly, while the Chase List is not empty. It stops re-arming — and any open copy auto-completes — the moment the Chase List clears",desc:"Opening the Task shows the AI-drafted request email — the “Document Request — Initial” template the first time, “Document Request — Reminder” on every repeat — and the law firm approves it before it is sent to the debtor."},
           ].map((task,i)=>{
             const enabled=taskToggles[task.title]!==false;
             const sc=task.batch?{bg:"#fef3cd",border:"#F59E0B",text:"#856404"}:(leadStageColors[task.stage]||{bg:"#f5f5f5",border:"#999",text:"#555"});
@@ -2675,15 +2675,15 @@ function SettingsPage(){
                   "A case is Document-complete when everything is Approved or Excused \u2014 the Lead Stage moves to Ready for Petition Prep automatically, and moves back to Intake Submitted if the law firm reopens any Document or requests a new one."
                 ]},
                 {h:"How and when we follow up",rules:[
-                  "The chase list is built by your review \u2014 rejected Documents and Keep Chasing rulings \u2014 plus anything never uploaded.",
+                  "The Chase List is built by law firm review: rejected Documents, and missing Documents that are not Excused. Every follow-up email requesting them must be approved by the law firm before it is sent.",
                   "The moment the initial review is finished with anything left to chase, the \u201cApprove document follow-up request\u201d Task is created. Nothing runs on a blind timer.",
                   "The AI drafts the request email \u2014 \u201cDocument Request \u2014 Initial\u201d the first time, \u201cReminder\u201d on repeats \u2014 and nothing is sent without firm approval.",
-                  "Follow-ups repeat weekly while the chase list is not empty; the Task completes itself the moment the list clears.",
+                  "Follow-ups repeat weekly while the Chase List is not empty; the Task completes itself the moment the list clears.",
                   "Every follow-up email carries the debtor\u2019s secure upload link. Each upload lands in its own requested item, is AI-screened, and reaches your review through the daily 5:00 a.m. batch."
                 ]},
                 {h:"What the debtor\u2019s reasons do",rules:[
-                  "\u201c"+DOC_REASONS.will_send_later+"\u201d and \u201c"+DOC_REASONS.not_taken_yet+"\u201d keep the item on the chase list automatically.",
-                  "\u201c"+DOC_REASONS.doesnt_apply+"\u201d, \u201c"+DOC_REASONS.didnt_file+"\u201d, and \u201c"+DOC_REASONS.dont_have_copy+"\u201d wait for your ruling: Excuse closes the item; Keep Chasing puts it on the follow-up list.",
+                  "\u201c"+DOC_REASONS.will_send_later+"\u201d and \u201c"+DOC_REASONS.not_taken_yet+"\u201d keep the item on the Chase List automatically.",
+                  "\u201c"+DOC_REASONS.doesnt_apply+"\u201d, \u201c"+DOC_REASONS.didnt_file+"\u201d, and \u201c"+DOC_REASONS.dont_have_copy+"\u201d wait for your ruling: Excuse closes the item; Keep Chasing puts it on the Chase List.",
                   "One per asset: valuation reports, mortgage statements, and vehicle titles generate one checklist item per property or vehicle."
                 ]}
               ].map(sec=>(
