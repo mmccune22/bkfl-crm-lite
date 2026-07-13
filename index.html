@@ -2680,7 +2680,8 @@ function SettingsPage(){
                   "The email is not sent until the law firm approves that Task. Both templates live in Settings \u2192 Communications.",
                   "\u201cDocument Request \u2014 Initial\u201d \u2014 the first request, sent once after the initial Document review.",
                   "\u201cDocument Request \u2014 Reminder\u201d \u2014 the automated follow-up, repeating weekly while the Chase List is not empty. The Task completes itself the moment the list clears.",
-                  "Every follow-up email carries the debtor\u2019s secure upload link. Each upload lands in its own requested item, is AI-screened, and reaches your review through the daily 5:00 a.m. batch."
+                  "Every follow-up email carries the debtor\u2019s secure upload link. Each upload lands in its own requested Document \u2014 never a loose pile \u2014 and is AI-screened on arrival.",
+                  "Post-submission uploads never create a Task per file. Once a day, the 5:00 a.m. batch digests everything received since the last run into a single \u201cReview Documents \u2014 follow-up uploads\u201d Task per Lead \u2014 at most one open at a time, its Document count refreshed by each batch."
                 ]},
                 {h:"What the debtor\u2019s reasons do",rules:[
                   "\u201c"+DOC_REASONS.will_send_later+"\u201d and \u201c"+DOC_REASONS.not_taken_yet+"\u201d keep the item on the Chase List automatically.",
