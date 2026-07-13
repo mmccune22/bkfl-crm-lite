@@ -2660,12 +2660,12 @@ function SettingsPage(){
             </div>
             <div style={{padding:"16px 20px",fontSize:13,color:"#555",lineHeight:1.65}}>
               {(()=>{let n=0;return [
-                {h:"Where the checklist comes from",rules:[
-                  "Set by the AI intake. Fixed in this version \u2014 shown here for reference.",
-                  "A Document is only requested when the debtor\u2019s intake answers call for it \u2014 no property, no property Documents.",
-                  "Every case uses the first list (All Cases \u2014 Every Filing).",
-                  "Married, filing jointly: all 7 spouse Documents are added.",
-                  "Married, filing individually: only the 3 spouse income Documents are added \u2014 the spouse isn\u2019t a filer, but their income counts for the means test.",
+                {h:"Where the Document checklist comes from",rules:[
+                  "The Document checklist is set by the AI intake. Fixed in this version \u2014 shown here for reference.",
+                  "A Document is only requested when the debtor\u2019s intake answers call for it (Required Documents are requested in every case).",
+                  "Every case uses the All Cases (every filing) list below.",
+                  "The Married \u2014 Filing Jointly list adds all 7 spouse Documents.",
+                  "The Married \u2014 Filing Individually list adds only the 3 spouse income Documents \u2014 the spouse isn\u2019t a filer, but their income counts for the means test.",
                   "The Intake Rule badge on each Document (Required to Submit / Upload or Reason / Optional) governs the debtor\u2019s submission only. Your review is the same for every Document."
                 ]},
                 {h:"How a Document moves",rules:[
