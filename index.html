@@ -524,7 +524,7 @@ const DOC_REASONS={will_send_later:"I'll send it later",not_taken_yet:"I haven't
 const CHASE_REASONS=["will_send_later","not_taken_yet"]; /* keep the item on the chase list */
 const REVIEW_REASONS=["doesnt_apply","didnt_file","dont_have_copy"]; /* debtor's reason \u2014 waits for a firm ruling: Excuse or Keep Chasing */
 const docMeta=(docId)=>DOC_TYPES.find(d=>d.id===docId)||{name:docId,req:"optional"};
-const reqBadge={required:{label:"Must Upload",bg:"#fde8e8",text:"#c0392b",border:"#f5b7b1"},needed:{label:"Upload or Reason",bg:"#fef3cd",text:"#856404",border:"#ffc107"},optional:{label:"Optional",bg:"#f0f0ed",text:"#888",border:"#ccc"}};
+const reqBadge={required:{label:"Required to Submit",bg:"#fde8e8",text:"#c0392b",border:"#f5b7b1"},needed:{label:"Upload or Reason",bg:"#fef3cd",text:"#856404",border:"#ffc107"},optional:{label:"Optional",bg:"#f0f0ed",text:"#888",border:"#ccc"}};
 
 
 /* ─── SOFA QUESTIONS — the 27 questions on the AI intake's Financial Affairs page ─── */
@@ -2653,11 +2653,11 @@ function SettingsPage(){
 
       {settingsTab==="docs"&&(
         <div style={{maxWidth:900}}>
-          <p style={{fontSize:13,color:"#888",marginBottom:16}}>The document types collected by the AI intake. Every case uses the first list (All Cases — Every Filing). Married cases add spouse documents: filing jointly adds all 7; filing individually adds only the 3 income documents (the spouse isn't a filer, but their income counts for the means test — no spouse ID or Social Security proof needed).</p>
+          <p style={{fontSize:13,color:"#888",marginBottom:16}}>The master document rulebook — set by the AI intake and mirrored here read-only. The tiers below control what the debtor must do before submitting over in the intake; they don't change your review — every Document gets the same Approve / Reject / Excuse treatment on the Lead's Documents tab. Every case uses the first list (All Cases — Every Filing); married cases add spouse Documents: filing jointly adds all 7, filing individually adds only the 3 income Documents (the spouse isn't a filer, but their income counts for the means test). To change a tier or trigger, change the intake — the document id and tier are the shared contract between the two windows.</p>
           <div style={{display:"flex",gap:16,flexWrap:"wrap",marginBottom:16,fontSize:12,color:"#666"}}>
-            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fde8e8",color:"#c0392b",border:"1px solid #f5b7b1",marginRight:6}}>Must Upload</span>The debtor cannot submit the intake without it.</span>
-            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fef3cd",color:"#856404",border:"1px solid #ffc107",marginRight:6}}>Upload or Reason</span>Upload it, or tell us why not — never blocks submission.</span>
-            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#f0f0ed",color:"#888",border:"1px solid #ccc",marginRight:6}}>Optional</span>Helpful if they have it — never chased.</span>
+            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fde8e8",color:"#c0392b",border:"1px solid #f5b7b1",marginRight:6}}>Required to Submit</span>The intake will not let the debtor submit without it.</span>
+            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#fef3cd",color:"#856404",border:"1px solid #ffc107",marginRight:6}}>Upload or Reason</span>The debtor uploads it or gives a reason — never blocks submission; reasons come to you for a ruling.</span>
+            <span><span style={{padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700,background:"#f0f0ed",color:"#888",border:"1px solid #ccc",marginRight:6}}>Optional</span>Helpful if they have it — never chased, never counted.</span>
           </div>
           {[
             {title:"All Cases (every filing)",ids:DOC_TYPES.filter(d=>d.group==="all").map(d=>d.id)},
