@@ -54,6 +54,13 @@ agent prompt all follow it. (Matt, 2026-07-13.)
   confidence only as plain-language basis statements (see §5). The score itself is
   firm-facing, on the AI tab.
 - **Raw intake answers** — that is the Intake Package, a separate document.
+- **Exemption analysis and equity characterization** (decided 2026-07-13). The Summary
+  never computes equity, applies exemptions, or states that any asset is protected or
+  unprotected — the highest-liability content an auto-generated letter could carry
+  (scheme election, residency look-back, title, valuation are legal judgment). "Your
+  Numbers at a Glance" is purely descriptive: declared values, summed deterministically.
+  Exemption analysis belongs to the future analysis layer (firm-facing, Matt-authored
+  prompts, post-handoff) — not to the intake Summary in any version.
 - Any advice, chapter recommendation, or outcome promise.
 
 ## The firm-facing companion (Lead's AI tab)
