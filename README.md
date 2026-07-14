@@ -2,6 +2,8 @@
 
 The scaled-down, debtor-intake-only version of the BK FastLane CRM. This is the law firm's entry point into the platform: a debtor submits an intake packet, and the firm receives, reviews, and works it from a clean dashboard. Reference prototype for the v1 development build.
 
+**Developers: start with [docs/HANDOFF.md](docs/HANDOFF.md)** — the front door to both repos, every spec, and the decision record.
+
 ## Running it
 
 Open `index.html` in any modern browser. No build step, no server — it's a single self-contained file (React via CDN). Demo data seeds automatically; all state persists in browser localStorage under `bkfl_lite_*` keys.
