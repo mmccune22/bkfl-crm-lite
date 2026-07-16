@@ -2838,7 +2838,7 @@ function SettingsPage(){
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"20px 24px",borderBottom:"1px solid #e0e0e0"}}>
               <div>
                 <h2 style={{fontSize:16,fontWeight:700,color:"#434343",margin:0}}>User Management</h2>
-                <p style={{fontSize:13,color:"#888",margin:"4px 0 0"}}>Manage staff access, permissions and account statuses.</p>
+                <p style={{fontSize:13,color:"#888",margin:"4px 0 0"}}>Manage staff access, permissions and account statuses. Every partner law firm also has one permanent firm account — named for the firm, role Law Firm, always Active, with a single firm email address. It cannot be edited or deactivated.</p>
               </div>
             </div>
             <div style={{background:"#fff",borderRadius:8,margin:20,border:"1px solid #e0e0e0",overflow:"hidden"}}>
@@ -2850,7 +2850,15 @@ function SettingsPage(){
                 <thead><tr style={{background:"#FBFAF7",borderBottom:"1px solid #e0e0e0"}}>
                   {["Name","Email ID","Role","Status","Action"].map(h=><th key={h} style={{textAlign:"left",padding:"10px 14px",color:"#666",fontWeight:600,fontSize:12,textTransform:"uppercase",letterSpacing:0.5}}>{h}</th>)}
                 </tr></thead>
-                <tbody>{users.map((u,i)=>(
+                <tbody>
+                  <tr style={{borderBottom:"1px solid #f0f0f0",background:"#f7faf7"}}>
+                    <td style={{padding:"14px 14px",fontWeight:700,color:"#3d5c43"}}>{org.name}<span style={{marginLeft:8,fontSize:9.5,fontWeight:700,color:"#7a9c80",border:"1px solid #9bba9f",borderRadius:4,padding:"1px 6px"}}>FIRM ACCOUNT</span></td>
+                    <td style={{padding:"14px 14px",color:"#3d5c43",fontWeight:600}}>{(org.name||"firm").toLowerCase().replace(/[^a-z0-9]/g,"")+"@bkfastlane.com"}</td>
+                    <td style={{padding:"14px 14px",color:"#3d5c43",fontWeight:600}}>Law Firm</td>
+                    <td style={{padding:"14px 14px"}}><span style={{padding:"3px 10px",borderRadius:4,fontSize:11,fontWeight:600,background:"#dce8de",color:"#3d5c43"}}>Active</span></td>
+                    <td style={{padding:"14px 14px",fontSize:11.5,color:"#999",fontStyle:"italic"}}>Cannot be edited {"\u2014"} always active</td>
+                  </tr>
+                  {users.map((u,i)=>(
                   <tr key={u.id} style={{borderBottom:"1px solid #f0f0f0"}} onMouseEnter={e=>e.currentTarget.style.background="#f2f3ef"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                     <td style={{padding:"14px 14px",fontWeight:500,color:"#434343"}}>{u.firstName} {u.lastName}</td>
                     <td style={{padding:"14px 14px",color:"#555"}}>{u.email}</td>
