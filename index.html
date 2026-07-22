@@ -1328,6 +1328,20 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
   const deleteTask=async(id)=>{if(await confirm({title:"Remove Task",message:"Remove this Task without completing it? It stays in the Task history as Removed.",confirmLabel:"Remove"}))update({tasks:lead.tasks.map(t=>t.id===id?{...t,status:"Removed",removedDate:new Date().toISOString().split("T")[0]}:t)});};
   const restoreTask=(id)=>update({tasks:lead.tasks.map(t=>t.id===id?{...t,status:"Pending",removedDate:undefined,restoredDate:new Date().toISOString().split("T")[0]}:t)});
   const [leadTaskModal,setLeadTaskModal]=useState(null);
+  const [resendModal,setResendModal]=useState(null); /* "send" (New Lead, no open task) | "resend" (Intake Sent) */
+  const approveSendIntake=()=>{
+    const today=new Date().toISOString().split("T")[0];
+    const spec=EMAIL_TASKS["Send the intake link"];
+    const comm={id:Date.now(),date:today,type:"Email",direction:"Outgoing",subject:spec.subject,body:spec.body(lead),to:lead.firstName+" "+lead.lastName,email:lead.email||""};
+    if(resendModal==="resend"){
+      update({communications:[comm,...(lead.communications||[])],timeline:[{id:Date.now()+1,date:today,action:"Intake link re-sent",detail:"Re-sent from the Lead page",user:CURRENT_USER},...(lead.timeline||[])]});
+    }else{
+      let tasks=(lead.tasks||[]).map(tk=>tk.status==="Pending"&&tk.title==="Send the intake link"?{...tk,status:"Completed",completedDate:today,completedBy:CURRENT_USER}:tk);
+      if(taskEnabled("Approve follow-up email — intake not completed")){const _due=new Date(Date.now()+7*86400000).toISOString().split("T")[0];tasks=[{id:Date.now()+2,title:"Approve follow-up email — intake not completed",due:_due,status:"Pending",assignee:"Matt McCune",stage:"Intake Sent",recurring:true},...tasks];}
+      update({leadStage:"Intake Sent",intakeSentDate:today,communications:[comm,...(lead.communications||[])],timeline:[{id:Date.now()+1,date:today,action:"Intake link sent",detail:"Status: New Lead \u2192 Intake Sent",user:CURRENT_USER},...(lead.timeline||[])],tasks:tasks});
+    }
+    setResendModal(null);
+  };
   const openLeadTask=(task)=>{
     if(task.status==="Completed"||task.status==="Removed")return;
     if(task.batchDigest){setTab("documents");return;}
@@ -1392,7 +1406,7 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
             <DetailRow label="Phone" value={<span style={{userSelect:"all",cursor:"text"}}>{lead.phone}</span>}/>
             <DetailRow label="Filing" value={(lead.contacts||[]).some(c=>c.role&&c.role.indexOf("Spouse")>=0)?"Joint":"Individual"}/>
             <DetailRow label="Stage" value={<span><StageBadge stage={lead.leadStage}/>{lead.leadStage==="Ready for Petition Prep"&&lead.prepReadyDate?<span style={{fontSize:11,color:"#00695c",marginLeft:8,fontWeight:700}}>{prepAge(lead)}</span>:<span style={{fontSize:11,color:"#999",marginLeft:8,fontStyle:"italic"}}>set automatically</span>}</span>}/>
-            <DetailRow label="Intake sent" value={lead.intakeSentDate?new Date(lead.intakeSentDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}):(()=>{const st=(lead.tasks||[]).find(tk=>tk.status==="Pending"&&tk.title==="Send the intake link");return(<span style={{display:"inline-flex",alignItems:"center",gap:10}}><span style={{color:"#999",fontStyle:"italic"}}>Not yet sent</span>{st&&<button onClick={()=>openLeadTask(st)} style={{background:"#7a9c80",color:"#fff",border:"none",borderRadius:5,padding:"4px 14px",fontSize:11.5,fontWeight:600,cursor:"pointer"}}>Send Intake Link</button>}</span>);})()}/>
+            <DetailRow label="Intake sent" value={lead.intakeSentDate?(<span style={{display:"inline-flex",alignItems:"center",gap:10}}>{new Date(lead.intakeSentDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"})}{lead.leadStage==="Intake Sent"&&<button onClick={()=>setResendModal("resend")} style={{background:"#fff",color:"#3d5c43",border:"1px solid #9bba9f",borderRadius:5,padding:"3px 12px",fontSize:11.5,fontWeight:600,cursor:"pointer"}}>Resend Link</button>}</span>):(()=>{const st=(lead.tasks||[]).find(tk=>tk.status==="Pending"&&tk.title==="Send the intake link");return(<span style={{display:"inline-flex",alignItems:"center",gap:10}}><span style={{color:"#999",fontStyle:"italic"}}>Not yet sent</span><button onClick={()=>st?openLeadTask(st):setResendModal("send")} style={{background:"#7a9c80",color:"#fff",border:"none",borderRadius:5,padding:"4px 14px",fontSize:11.5,fontWeight:600,cursor:"pointer"}}>Send Intake Link</button></span>);})()}/>
             <DetailRow label="Intake submitted" value={lead.intakeSubmittedDate?new Date(lead.intakeSubmittedDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}):"—"}/>
             <DetailRow label="Created" value={lead.createdDate?new Date(lead.createdDate+"T12:00:00").toLocaleDateString("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}):""}/>
             <DetailRow label="Notes" value={<EditVal field="leadNotes" value={lead.leadNotes}/>}/>
@@ -2037,6 +2051,22 @@ function LeadDetail({lead,setLeads,setPage,setSelectedLead,matters,setMatters,se
       </div>
 
 
+      {resendModal&&(()=>{const spec=EMAIL_TASKS["Send the intake link"];return(
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:60}} onClick={()=>setResendModal(null)}>
+          <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:12,width:620,maxWidth:"92vw",maxHeight:"86vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.3)",padding:"18px 24px"}}>
+            <div style={{fontSize:10.5,fontWeight:700,color:"#7a9c80",textTransform:"uppercase",letterSpacing:"0.6px",marginBottom:8}}>{resendModal==="resend"?"Re-send Intake Form Link":"Intake Form Link"} {"\u2014"} reviewed before it sends</div>
+            {resendModal==="resend"&&<div style={{fontSize:12,color:"#856404",background:"#fdf6e7",border:"1px solid #e5cf8f",borderRadius:6,padding:"8px 12px",marginBottom:10,lineHeight:1.5}}>Re-sending the same intake link {"\u2014"} nothing else changes: no Stage move, no new Task. The weekly follow-up keeps running on its own schedule.</div>}
+            <div style={{display:"grid",gridTemplateColumns:"64px 1fr",rowGap:4,columnGap:10,fontSize:12.5,marginBottom:10}}>
+              <span style={{color:"#999",fontWeight:600}}>To</span><span style={{color:"#434343"}}>{lead.firstName} {lead.lastName} {"\u00b7"} {lead.email}</span>
+              <span style={{color:"#999",fontWeight:600}}>Subject</span><span style={{color:"#434343",fontWeight:600}}>{spec.subject}</span>
+            </div>
+            <div style={{background:"#FBFAF7",border:"1px solid #e0e0e0",borderRadius:8,padding:"12px 14px",fontSize:12.5,color:"#555",lineHeight:1.6,whiteSpace:"pre-wrap",marginBottom:12}}>{spec.body(lead)}</div>
+            <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+              <button onClick={()=>setResendModal(null)} style={{padding:"6px 14px",fontSize:12,fontWeight:600,borderRadius:5,cursor:"pointer",border:"1px solid #d0d0d0",background:"#fff",color:"#555"}}>Cancel</button>
+              <button onClick={approveSendIntake} style={{padding:"6px 16px",fontSize:12,fontWeight:600,borderRadius:5,cursor:"pointer",border:"none",background:"#7a9c80",color:"#fff"}}>Approve &amp; Send</button>
+            </div>
+          </div>
+        </div>);})()}
       {leadTaskModal&&<TaskApprovalModal task={leadTaskModal} lead={lead} onClose={()=>setLeadTaskModal(null)} onApprove={(tk)=>{update(buildApprovalPatch(lead,tk));setLeadTaskModal(null);}}/>}
       {taskNotifyPopup&&(
         <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.35)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999}}>
